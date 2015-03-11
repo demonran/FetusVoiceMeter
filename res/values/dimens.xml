@@ -1,7 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
-
-    <!-- Default screen margins, per the Android Design guidelines. -->
-    <dimen name="activity_horizontal_margin">16dp</dimen>
-    <dimen name="activity_vertical_margin">16dp</dimen>
-
+    <dimen name="frequence_view_padding_top">15.0dip</dimen>
+    <dimen name="frequence_view_padding_bottom">15.0dip</dimen>
+    <dimen name="frequence_text_size">16.0sp</dimen>
+    <dimen name="history_little_size">14.0sp</dimen>
+    <dimen name="play_grid_bond_size">1.0dip</dimen>
+    <dimen name="play_grid_nor_size">0.5dip</dimen>
+    <dimen name="play_frequence_wave_size">1.0dip</dimen>
+    <dimen name="record_wave_base">20.0dip</dimen>
+    <dimen name="history_item_width">90.0dip</dimen>
+    <dimen name="mix_text_size">16.0sp</dimen>
+    <dimen name="global_padding_top">10.0dip</dimen>
+    <dimen name="global_padding_bottom">10.0dip</dimen>
+    <dimen name="global_padding_left">10.0dip</dimen>
+    <dimen name="global_padding_right">10.0dip</dimen>
+    <dimen name="title_bar_height">50.0dip</dimen>
+    <dimen name="setting_text_size">16.0sp</dimen>
+    <dimen name="setting_summary_size">14.0sp</dimen>
+    <dimen name="global_grid_space">20.0dip</dimen>
+    <dimen name="regist_text_size">18.0sp</dimen>
+    <dimen name="regist_label_width">85.0dip</dimen>
+    <dimen name="no_connect_label_size">16.0sp</dimen>
+    <dimen name="apps_item_width">130.0dip</dimen>
+    <dimen name="partner_item_width">70.0dip</dimen>
+    <dimen name="apps_item_name_size">16.0sp</dimen>
+    <dimen name="move_text_size">16.0sp</dimen>
+    <dimen name="move_stroke_width">2.0dip</dimen>
+    <dimen name="move_padding">20.0dip</dimen>
+    <dimen name="move_circle_radius">7.0dip</dimen>
+    <dimen name="recording_stroke_width">1.5dip</dimen>
+    <dimen name="history_item_date_size">16.0sp</dimen>
+    <dimen name="history_item_title_size">16.0sp</dimen>
+    <dimen name="history_item_average_size">24.0sp</dimen>
+    <dimen name="history_item_summary_size">12.0sp</dimen>
 </resources>

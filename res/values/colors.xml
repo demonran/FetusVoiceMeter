@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="main_wave_color">#ff696969</color>
+    <color name="frequence_wave_color">#ff000000</color>
+    <color name="text_grid_bond_color">#ffff0000</color>
+    <color name="text_grid_nor_color">#e5ff0000</color>
+    <color name="text_level_color">#99ff0000</color>
+    <color name="level_rect_color">#667fcc4c</color>
+    <color name="play_time_color">#ffffffff</color>
+    <color name="play_title_color">#ffffffff</color>
+    <color name="play_subtitle_color">#ffb93265</color>
+    <color name="main_text_color">#ffd96161</color>
+    <color name="music_text_color">#ff698f42</color>
+    <color name="setting_text_color">#ffffffff</color>
+    <color name="setting_summary_color">#ffffffff</color>
+    <color name="global_text_pink_color">#ffff5490</color>
+    <color name="no_connect_label_color">#ff9f9f9f</color>
+    <color name="partner_name_color">#ff8b8983</color>
+</resources>

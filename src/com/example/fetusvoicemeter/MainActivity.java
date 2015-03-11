@@ -3,25 +3,24 @@ package com.example.fetusvoicemeter;
 
 import java.util.ArrayList;
 
-import android.os.Bundle;
 import android.app.Activity;
-import android.content.Intent;
+import android.os.Bundle;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v4.view.ViewPager.OnPageChangeListener;
+import android.util.Log;
 import android.view.Display;
-import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.WindowManager;
-import android.view.WindowManager.LayoutParams;
 import android.view.animation.Animation;
 import android.view.animation.TranslateAnimation;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.PopupWindow;
-import android.widget.Toast;
+
+import com.fetus.FetusCore;
 
 public class MainActivity extends Activity {
 	
@@ -46,6 +45,8 @@ public class MainActivity extends Activity {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main_weixin);
+        int sum = FetusCore.add(1, 2);
+        Log.i("TAG",sum+"***");
          //启动activity时不自动弹出软键盘
         getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN); 
         instance = this;
@@ -71,7 +72,6 @@ public class MainActivity extends Activity {
         mTab4.setOnClickListener(new MyOnClickListener(3));
         Display currDisplay = getWindowManager().getDefaultDisplay();//获取屏幕当前分辨率
         int displayWidth = currDisplay.getWidth();
-        int displayHeight = currDisplay.getHeight();
         one = displayWidth/4; //设置水平动画平移大小
         two = one*2;
         three = one*3;
