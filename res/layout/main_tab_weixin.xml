@@ -112,18 +112,14 @@
         		 android:paddingLeft="20dp"
 				android:onClick="btnmainright"
 			    />  
-            
         </RelativeLayout>
-          <FrameLayout android:background="#fffcf9ee" android:layout_width="fill_parent" android:layout_height="0.0dip" android:layout_weight="3.0">
-            <FrameLayout android:paddingTop="10.0dip" android:paddingBottom="10.0dip" android:layout_width="fill_parent" android:layout_height="fill_parent">
-                <HorizontalScrollView android:id="@+id/scroll" android:scrollbars="none" android:fadingEdge="none" android:layout_width="fill_parent" android:layout_height="fill_parent" android:overScrollMode="never">
-                    <LinearLayout android:orientation="horizontal" android:layout_width="wrap_content" android:layout_height="fill_parent">
-                        <com.example.fetusvoicemeter.view.HKPlayWaveView android:layout_gravity="center_vertical" android:id="@+id/frequence_wave" android:layout_width="fill_parent" android:layout_height="fill_parent" />
-                    </LinearLayout>
-                </HorizontalScrollView>
-                <ImageView android:layout_gravity="left|center" android:id="@+id/play" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_margin="30.0dip" android:src="@drawable/play_start" />
-                <ImageView android:layout_gravity="right|center" android:id="@+id/replay" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_margin="30.0dip" android:src="@drawable/play_replay" />
-            </FrameLayout>
-            <ImageView android:layout_gravity="center" android:paddingTop="5.0dip" android:paddingBottom="5.0dip" android:layout_width="wrap_content" android:layout_height="fill_parent" android:src="@drawable/play_middle_bar" android:scaleType="fitXY" />
-        </FrameLayout>
+        
+           <LinearLayout android:orientation="vertical" android:background="#fffcf9ee" android:paddingTop="20.0dip" android:layout_width="fill_parent" android:layout_height="0.0dip" android:layout_weight="1.0">
+                <FrameLayout android:background="#fffcf9ee" android:layout_width="fill_parent" android:layout_height="0.0dip" android:layout_weight="1.0">
+                    <com.example.fetusvoicemeter.view.HKRecordBgView android:layout_width="fill_parent" android:layout_height="fill_parent" />
+                    <com.example.fetusvoicemeter.view.HKRecordWaveView android:id="@+id/rec_wave" android:layout_width="fill_parent" android:layout_height="fill_parent" />
+                </FrameLayout>
+            </LinearLayout>
+          
+          
  </LinearLayout>

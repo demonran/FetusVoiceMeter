@@ -4,6 +4,8 @@ import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.util.AttributeSet;
+import android.util.DisplayMetrics;
+import android.util.Log;
 import android.view.View;
 import android.view.WindowManager;
 
@@ -31,40 +33,29 @@ public class HKRecordBgView extends HKBaseView
     init();
   }
 
-  private void drawGrid(Canvas paramCanvas)
+  private void drawGrid(Canvas canvas)
   {
+	  DisplayMetrics outMetrics = new DisplayMetrics();
+	  Log.i("TAG",outMetrics.widthPixels+","+outMetrics.heightPixels+"***");
+	  Log.i("TAG",canvas.getWidth()+","+canvas.getHeight()+"***");
     float f1 = (View.MeasureSpec.getSize(getHeight()) - this.mPaddingTop - this.mPaddingBottom) / this.gridYnum;
-    int i = 0;
-    if (i <= this.gridYnum)
+    Log.i("TAG",getHeight()+","+View.MeasureSpec.getSize(getHeight()));
+    Paint localPaint2 = this.mGridBondPaint;
+//      if (i % 3 == 0);
+   
+	  for (int i = 0;i <= this.gridYnum ; i++)
+	  {
+	    canvas.drawLine(0.0F, this.mPaddingTop + f1 * i, View.MeasureSpec.getSize(getWidth()), this.mPaddingTop + f1 * i, localPaint2);
+	    Log.i("TAG", "0.0F,"+ (this.mPaddingTop + f1 * i)+", 720, "+(this.mPaddingTop + f1 * i));
+	  }
+    
+	  float f2 = 3.0F * f1;
+//        if (k % 3 == 0);
+    for (int k = 0;k <= this.gridYnum ; k++)
     {
-      if (i % 3 == 0);
-      for (Paint localPaint2 = this.mGridBondPaint; ; localPaint2 = this.mGridPaint)
-      {
-        paramCanvas.drawLine(0.0F, this.mPaddingTop + f1 * i, this.mWidth, this.mPaddingTop + f1 * i, localPaint2);
-        i++;
-        break;
-      }
+      canvas.drawLine(this.mBaseX + f2 * k, this.mPaddingTop, this.mBaseX + f2 * k, View.MeasureSpec.getSize(getHeight()) - this.mPaddingBottom, localPaint2);
+      canvas.drawLine(this.mBaseX - f2 * k, this.mPaddingTop, this.mBaseX - f2 * k, View.MeasureSpec.getSize(getHeight()) - this.mPaddingBottom, localPaint2);
     }
-    float f2 = 3.0F * f1;
-    int j = Math.round(this.mWidth / f2);
-    int k = 0;
-    while (k <= j)
-      if (this.mBaseX + f2 * k > this.mWidth)
-      {
-        k++;
-      }
-      else
-      {
-        if (k % 3 == 0);
-        for (Paint localPaint1 = this.mGridBondPaint; ; localPaint1 = this.mGridPaint)
-        {
-          paramCanvas.drawLine(this.mBaseX + f2 * k, this.mPaddingTop, this.mBaseX + f2 * k, View.MeasureSpec.getSize(getHeight()) - this.mPaddingBottom, localPaint1);
-          if (this.mBaseX - f2 * k < 0.0F)
-            break;
-          paramCanvas.drawLine(this.mBaseX - f2 * k, this.mPaddingTop, this.mBaseX - f2 * k, View.MeasureSpec.getSize(getHeight()) - this.mPaddingBottom, localPaint1);
-          break;
-        }
-      }
   }
 
   private void init()

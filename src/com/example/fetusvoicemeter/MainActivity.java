@@ -2,9 +2,17 @@ package com.example.fetusvoicemeter;
 
 
 import java.util.ArrayList;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import android.app.Activity;
+import android.media.AudioFormat;
+import android.media.AudioManager;
+import android.media.AudioRecord;
+import android.media.AudioTrack;
+import android.media.MediaRecorder;
 import android.os.Bundle;
+import android.os.Message;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v4.view.ViewPager.OnPageChangeListener;
@@ -19,7 +27,9 @@ import android.view.animation.TranslateAnimation;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.PopupWindow;
+import android.widget.Toast;
 
+import com.example.fetusvoicemeter.view.HKRecordWaveView;
 import com.fetus.FetusCore;
 
 public class MainActivity extends Activity {
@@ -39,7 +49,24 @@ public class MainActivity extends Activity {
 	private boolean menu_display = false;
 	private PopupWindow menuWindow;
 	private LayoutInflater inflater;
+	
+	private HKRecordWaveView recordWaveView;
 	//private Button mRightBtn;
+	
+	/**
+	 * 在画布上正在显示的数据集合
+	 */
+	private ArrayList<Integer> showedList = new ArrayList<Integer>();
+	
+	
+	   boolean isRecording = false;//是否录放的标记  
+	    static final int frequency = 44100;  
+	    static final int channelConfiguration = AudioFormat.CHANNEL_CONFIGURATION_MONO;  
+	    static final int audioEncoding = AudioFormat.ENCODING_PCM_16BIT;  
+	    int recBufSize,playBufSize;  
+	    AudioRecord audioRecord;  
+	    AudioTrack audioTrack;
+	    Timer timer;
 	
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -50,14 +77,22 @@ public class MainActivity extends Activity {
          //启动activity时不自动弹出软键盘
         getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN); 
         instance = this;
-        /*
-        mRightBtn = (Button) findViewById(R.id.right_btn);
-        mRightBtn.setOnClickListener(new Button.OnClickListener()
-		{	@Override
-			public void onClick(View v)
-			{	showPopupWindow (MainWeixin.this,mRightBtn);
-			}
-		  });*/
+       
+        recBufSize = AudioRecord.getMinBufferSize(frequency,  
+                channelConfiguration, audioEncoding);  
+        Log.i("TAG","recBufSize="+recBufSize+"---");
+  
+        playBufSize=AudioTrack.getMinBufferSize(frequency,  
+                channelConfiguration, audioEncoding);  
+        Log.i("TAG","playBufSize="+playBufSize+"---");
+        // -----------------------------------------  
+        audioRecord = new AudioRecord(MediaRecorder.AudioSource.MIC, frequency,  
+                channelConfiguration, audioEncoding, recBufSize);  
+  
+        audioTrack = new AudioTrack(AudioManager.STREAM_VOICE_CALL, frequency,  
+                channelConfiguration, audioEncoding,  
+                playBufSize, AudioTrack.MODE_STREAM);  
+        timer =  new Timer();
         
         mTabPager = (ViewPager)findViewById(R.id.tabpager);
         mTabPager.setOnPageChangeListener(new MyOnPageChangeListener());
@@ -81,6 +116,7 @@ public class MainActivity extends Activity {
       //将要分页显示的View装入数组中
         LayoutInflater mLi = LayoutInflater.from(this);
         View view1 = mLi.inflate(R.layout.main_tab_weixin, null);
+        recordWaveView = (HKRecordWaveView)view1.findViewById(R.id.rec_wave);
         View view2 = mLi.inflate(R.layout.main_tab_address, null);
         View view3 = mLi.inflate(R.layout.main_tab_friends, null);
         View view4 = mLi.inflate(R.layout.main_tab_settings, null);
@@ -292,6 +328,67 @@ public class MainActivity extends Activity {
 //		Intent intent = new Intent (MainWeixin.this,ShakeActivity.class);			
 //		startActivity(intent);	
 //	}
+	
+	
+	public void btnmainright(View view)
+	{
+		 isRecording = true;  
+         new RecordPlayThread().start();// 开一条线程边录边放  
+         timer.schedule(new RecBpm(), 1000, 250);
+	}
+	
+	  class RecBpm extends TimerTask{
+
+			@Override
+			public void run() {
+				int bpm = FetusCore.get();
+				Message msg = new Message();
+				msg.obj = "***bpm="+bpm+"***";
+				showedList.add(bpm);
+				recordWaveView.updateVisualizer(showedList);
+				
+				Log.i("TAG","***bpm="+bpm+"***");
+				
+			}
+	    	
+	    }
+	  
+	    class RecordPlayThread extends Thread {  
+	        public void run() {  
+	            try {  
+	                byte[] buffer = new byte[recBufSize];  
+	                audioRecord.startRecording();//开始录制  
+	                audioTrack.play();//开始播放  
+	                  
+	                while (isRecording) {  
+	                    //从MIC保存数据到缓冲区  
+	                    int bufferReadResult = audioRecord.read(buffer, 0,  
+	                            recBufSize);  
+	  
+	                    byte[] tmpBuf = new byte[bufferReadResult];  
+	                    System.arraycopy(buffer, 0, tmpBuf, 0, bufferReadResult);  
+	                    //写入数据即播放  
+//	                    Log.i("TAG","tmpBuf.length="+tmpBuf.length+"---");
+	                    FetusCore.put(tmpBuf, tmpBuf.length);
+	                    audioTrack.write(tmpBuf, 0, tmpBuf.length);  
+	                }  
+	                audioTrack.stop();  
+	                audioRecord.stop();  
+	            } catch (Throwable t) {  
+	                Toast.makeText(MainActivity.this, t.getMessage(), Toast.LENGTH_LONG).show();  
+	            }  
+	        }  
+	    };  
+	    
+	    private void startDealThread()
+	    {
+	    	new Thread(){
+	    		public void run()
+	    		{
+	    			FetusCore.deal();
+	    		}
+	    	}.start();
+	    }
 }
     
     

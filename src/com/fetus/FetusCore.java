@@ -27,7 +27,7 @@ public class FetusCore {
 	/*
 	该函数用来获取计算出的数值
 	*/
-	public native static  byte[] get();
+	public native static  int get();
 
 
 
