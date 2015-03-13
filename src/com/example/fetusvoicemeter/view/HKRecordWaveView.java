@@ -1,15 +1,14 @@
 package com.example.fetusvoicemeter.view;
 
-import java.util.Arrays;
 import java.util.List;
 
-import android.annotation.SuppressLint;
 import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Rect;
 import android.util.AttributeSet;
+import android.util.Log;
 
 public class HKRecordWaveView extends HKBaseView
 {
@@ -18,6 +17,8 @@ public class HKRecordWaveView extends HKBaseView
   private Rect mRect = new Rect();
   
   private Paint linePaint = new Paint();
+  
+  private boolean isFirstDraw = true;
   
 	/**
 	 * 显示的波形每个单元格开始的位置(X轴坐标)
@@ -53,7 +54,7 @@ public class HKRecordWaveView extends HKBaseView
 	// 设置画笔的线条粗细
 	linePaint.setStrokeWidth(2);
 	
-	maxNum = (getWidth()/2 - 5) / 5;
+	maxNum = 100;
   }
 
   private void drawDefault(Canvas canvas)
@@ -87,6 +88,10 @@ public class HKRecordWaveView extends HKBaseView
   {
 	  int width = canvas.getWidth();
 	  int height = canvas.getHeight();
+		if (isFirstDraw) {
+			maxNum = (width/2 - 5) / 5;
+			isFirstDraw = false;
+		}
 	//如果心电数据集合中有数据
 		if (showList!= null && showList.size() >0) {
 			
@@ -96,7 +101,7 @@ public class HKRecordWaveView extends HKBaseView
 			}
 			
 		
-			showedBeginX = width/2 - (5 * showList.size()+5);
+			showedBeginX = width - (5 * showList.size()+5);
 			showedEndX = showedBeginX + 5;
 			showedBeginY = height / 2;
 			for (int i = 0; i < showList.size(); i++) {
@@ -105,14 +110,7 @@ public class HKRecordWaveView extends HKBaseView
 				showedBeginX = showedEndX;
 				showedEndX = showedBeginX +5;
 				showedBeginY = showedEndY;
-				if (showList.size() != 1 && showList.size() != (i + 1)) {
-					try {
-						showedEndY = showList.get(i+1);
-					} catch (Exception e) {
-						e.printStackTrace();
-						break;
-					}
-				}
+				showedEndY = height+60-showList.get(i+1);
 			}
 		}
 			

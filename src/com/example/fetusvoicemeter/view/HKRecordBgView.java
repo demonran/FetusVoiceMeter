@@ -12,12 +12,14 @@ import android.view.WindowManager;
 public class HKRecordBgView extends HKBaseView
 {
   protected int gridYnum = 15;
+  protected int gridXnum = 8;
   private float mBaseX = 0.0F;
   private Context mContext;
   protected float mPaddingBottom = 0.0F;
   protected float mPaddingTop = 0.0F;
   protected float mUnitWidth = 0.0F;
   protected int mWidth = 0;
+  
 
   public HKRecordBgView(Context paramContext)
   {
@@ -35,26 +37,27 @@ public class HKRecordBgView extends HKBaseView
 
   private void drawGrid(Canvas canvas)
   {
-	  DisplayMetrics outMetrics = new DisplayMetrics();
-	  Log.i("TAG",outMetrics.widthPixels+","+outMetrics.heightPixels+"***");
 	  Log.i("TAG",canvas.getWidth()+","+canvas.getHeight()+"***");
     float f1 = (View.MeasureSpec.getSize(getHeight()) - this.mPaddingTop - this.mPaddingBottom) / this.gridYnum;
     Log.i("TAG",getHeight()+","+View.MeasureSpec.getSize(getHeight()));
-    Paint localPaint2 = this.mGridBondPaint;
-//      if (i % 3 == 0);
+    Paint localPaint2 = this.mGridPaint;
+//      
    
 	  for (int i = 0;i <= this.gridYnum ; i++)
 	  {
+		  if (i % 3 == 0)
+		  {
+			  localPaint2 = mGridBondPaint;
+		  }
 	    canvas.drawLine(0.0F, this.mPaddingTop + f1 * i, View.MeasureSpec.getSize(getWidth()), this.mPaddingTop + f1 * i, localPaint2);
-	    Log.i("TAG", "0.0F,"+ (this.mPaddingTop + f1 * i)+", 720, "+(this.mPaddingTop + f1 * i));
 	  }
     
-	  float f2 = 3.0F * f1;
 //        if (k % 3 == 0);
-    for (int k = 0;k <= this.gridYnum ; k++)
+    for (int k = 0;k <= this.gridXnum/2 ; k++)
     {
-      canvas.drawLine(this.mBaseX + f2 * k, this.mPaddingTop, this.mBaseX + f2 * k, View.MeasureSpec.getSize(getHeight()) - this.mPaddingBottom, localPaint2);
-      canvas.drawLine(this.mBaseX - f2 * k, this.mPaddingTop, this.mBaseX - f2 * k, View.MeasureSpec.getSize(getHeight()) - this.mPaddingBottom, localPaint2);
+    	 Log.i("TAG",","+k);
+      canvas.drawLine(this.mBaseX + mUnitWidth * k, this.mPaddingTop, this.mBaseX + mUnitWidth * k, View.MeasureSpec.getSize(getHeight()) - this.mPaddingBottom, localPaint2);
+      canvas.drawLine(this.mBaseX - mUnitWidth * k, this.mPaddingTop, this.mBaseX - mUnitWidth * k, View.MeasureSpec.getSize(getHeight()) - this.mPaddingBottom, localPaint2);
     }
   }
 
@@ -62,6 +65,7 @@ public class HKRecordBgView extends HKBaseView
   {
     this.mWidth = ((WindowManager)this.mContext.getSystemService("window")).getDefaultDisplay().getWidth();
     this.mBaseX = (this.mWidth / 2.0F);
+    this.mUnitWidth = this.mWidth/this.gridXnum;
   }
 
   public void onDraw(Canvas paramCanvas)
