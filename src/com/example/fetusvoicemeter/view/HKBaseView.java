@@ -43,13 +43,13 @@ public class HKBaseView extends View
     this.mDefaultPaint = new Paint();
     this.mDefaultPaint.setStrokeWidth(this.mContext.getResources().getDimension(R.dimen.app_icon_size));
     this.mDefaultPaint.setAntiAlias(true);
-    this.mDefaultPaint.setColor(this.mContext.getResources().getColor(R.color.tab_indicator_text));
+    this.mDefaultPaint.setColor(Color.RED);
   }
 
   private void initFrequencePaint()
   {
     this.mFrequencePaint = new Paint();
-    this.mFrequencePaint.setColor(this.mContext.getResources().getColor(R.color.tab_indicator_text));
+    this.mFrequencePaint.setColor(Color.BLACK);
     this.mFrequencePaint.setAntiAlias(true);
     this.mFrequencePaint.setStrokeWidth(getResources().getDimension(R.dimen.app_icon_size));
   }
@@ -80,7 +80,7 @@ public class HKBaseView extends View
   private void initLevelRectPaint()
   {
     this.mLevelRectPaint = new Paint();
-    this.mLevelRectPaint.setColor(getResources().getColor(R.color.tab_indicator_text));
+    this.mLevelRectPaint.setColor(Color.RED);
     this.mLevelRectPaint.setStyle(Paint.Style.FILL);
     this.mLevelRectPaint.setAntiAlias(true);
   }
@@ -96,7 +96,7 @@ public class HKBaseView extends View
   private void initTextPaint()
   {
     this.mTextPaint = new Paint();
-    this.mTextPaint.setColor(getResources().getColor(R.color.tab_indicator_text));
+    this.mTextPaint.setColor(Color.RED);
     this.mTextPaint.setTextSize(getResources().getDimension(R.dimen.app_icon_size));
     this.mTextPaint.setAntiAlias(true);
   }
