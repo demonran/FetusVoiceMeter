@@ -59,7 +59,7 @@ public class HKBaseView extends View
     this.mGridBondPaint = new Paint();
     this.mGridBondPaint.setColor(Color.RED);
     this.mGridBondPaint.setAntiAlias(true);
-    this.mGridBondPaint.setStrokeWidth(1);
+    this.mGridBondPaint.setStrokeWidth(2);
   }
 
   private void initGridPaint()
@@ -67,7 +67,7 @@ public class HKBaseView extends View
     this.mGridPaint = new Paint();
     this.mGridPaint.setColor(Color.BLUE);
     this.mGridPaint.setAntiAlias(true);
-    this.mGridPaint.setStrokeWidth(2);
+    this.mGridPaint.setStrokeWidth(1);
   }
 
   private void initIntroducePaint()

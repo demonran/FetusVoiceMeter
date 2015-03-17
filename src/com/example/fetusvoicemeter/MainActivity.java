@@ -1,9 +1,15 @@
 package com.example.fetusvoicemeter;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
 import android.media.AudioFormat;
@@ -12,6 +18,7 @@ import android.media.AudioRecord;
 import android.media.AudioTrack;
 import android.media.MediaRecorder;
 import android.os.Bundle;
+import android.os.Environment;
 import android.os.Handler;
 import android.os.Message;
 import android.support.v4.view.PagerAdapter;
@@ -28,11 +35,12 @@ import android.view.animation.TranslateAnimation;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.PopupWindow;
-import android.widget.Toast;
+import android.widget.TextView;
 
 import com.example.fetusvoicemeter.view.HKRecordWaveView;
 import com.fetus.FetusCore;
 
+@SuppressLint("NewApi")
 public class MainActivity extends Activity {
 
 	public static MainActivity instance = null;
@@ -44,16 +52,16 @@ public class MainActivity extends Activity {
 	private int one;// 单个水平动画位移
 	private int two;
 	private int three;
-	private LinearLayout mClose;
-	private LinearLayout mCloseBtn;
-	private View layout;
+	private LinearLayout play_ll;
+	private LinearLayout rec_ll;
+	private TextView rec_fq_num;
 	private boolean menu_display = false;
 	private PopupWindow menuWindow;
-	private LayoutInflater inflater;
 
 	private HKRecordWaveView recordWaveView;
-	// private Button mRightBtn;
-
+	
+	private String temp = "recaudio_";// 临时文件前缀
+	private OutputStream mOutputStream;
 	/**
 	 * 在画布上正在显示的数据集合
 	 */
@@ -67,27 +75,42 @@ public class MainActivity extends Activity {
 	AudioRecord audioRecord;
 	AudioTrack audioTrack;
 	Timer timer;
-	
-    private Handler handler = new Handler(){
+
+	private Handler handler = new Handler() {
 
 		@Override
 		public void handleMessage(Message msg) {
+			int bpm = msg.arg1;
+			rec_fq_num.setText(String.valueOf(bpm));
+			showedList.add(bpm);
 			recordWaveView.updateVisualizer(showedList);
 		}
-    	
-    };
+
+	};
+
+	private File mWriteFile;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.main_weixin);
-		int sum = FetusCore.add(1, 2);
-		Log.i("TAG", sum + "***");
 		// 启动activity时不自动弹出软键盘
 		getWindow().setSoftInputMode(
 				WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
 		instance = this;
+		initUI();
 
+		initRecord();
+		setAudioOnSpeaker();
+		// setAudioNormal();
+
+		FetusCore.init();
+
+		timer = new Timer();
+
+	}
+
+	private void initRecord() {
 		recBufSize = AudioRecord.getMinBufferSize(frequency,
 				channelConfiguration, audioEncoding);
 		Log.i("TAG", "recBufSize=" + recBufSize + "---");
@@ -99,18 +122,12 @@ public class MainActivity extends Activity {
 		audioRecord = new AudioRecord(MediaRecorder.AudioSource.MIC, frequency,
 				channelConfiguration, audioEncoding, recBufSize);
 
-		audioTrack = new AudioTrack(AudioManager.STREAM_VOICE_CALL, frequency,
+		audioTrack = new AudioTrack(AudioManager.STREAM_MUSIC, frequency,
 				channelConfiguration, audioEncoding, playBufSize,
 				AudioTrack.MODE_STREAM);
+	}
 
-		setAudioOnSpeaker();
-	
-		
-		FetusCore.init();
-        startDealThread();
-        
-    	timer = new Timer();
-
+	private void initUI() {
 		mTabPager = (ViewPager) findViewById(R.id.tabpager);
 		mTabPager.setOnPageChangeListener(new MyOnPageChangeListener());
 
@@ -127,13 +144,15 @@ public class MainActivity extends Activity {
 		one = displayWidth / 4; // 设置水平动画平移大小
 		two = one * 2;
 		three = one * 3;
-		// Log.i("info", "获取的屏幕分辨率为" + one + two + three + "X" + displayHeight);
 
 		// InitImageView();//使用动画
 		// 将要分页显示的View装入数组中
 		LayoutInflater mLi = LayoutInflater.from(this);
 		View view1 = mLi.inflate(R.layout.main_tab_weixin, null);
 		recordWaveView = (HKRecordWaveView) view1.findViewById(R.id.rec_wave);
+		play_ll = (LinearLayout) view1.findViewById(R.id.play_ll);
+		rec_ll = (LinearLayout) view1.findViewById(R.id.rec_ll);
+		rec_fq_num = (TextView) view1.findViewById(R.id.rec_fq_num);
 		View view2 = mLi.inflate(R.layout.main_tab_address, null);
 		View view3 = mLi.inflate(R.layout.main_tab_friends, null);
 		View view4 = mLi.inflate(R.layout.main_tab_settings, null);
@@ -162,11 +181,6 @@ public class MainActivity extends Activity {
 				((ViewPager) container).removeView(views.get(position));
 			}
 
-			// @Override
-			// public CharSequence getPageTitle(int position) {
-			// return titles.get(position);
-			// }
-
 			@Override
 			public Object instantiateItem(View container, int position) {
 				((ViewPager) container).addView(views.get(position));
@@ -175,6 +189,11 @@ public class MainActivity extends Activity {
 		};
 
 		mTabPager.setAdapter(mPagerAdapter);
+	}
+
+	private void updateRecUI() {
+		play_ll.setVisibility(View.GONE);
+		rec_ll.setVisibility(View.VISIBLE);
 	}
 
 	/**
@@ -287,91 +306,24 @@ public class MainActivity extends Activity {
 	@Override
 	public boolean onKeyDown(int keyCode, KeyEvent event) {
 		if (keyCode == KeyEvent.KEYCODE_BACK && event.getRepeatCount() == 0) { // 获取
-																				// back键
-
-			if (menu_display) { // 如果 Menu已经打开 ，先关闭Menu
-				menuWindow.dismiss();
-				menu_display = false;
-			}
-			// else {
-			// Intent intent = new Intent();
-			// intent.setClass(MainWeixin.this,Exit.class);
-			// startActivity(intent);
-			// }
+			this.finish(); // back键
 		}
 
-		// else if(keyCode == KeyEvent.KEYCODE_MENU){ //获取 Menu键
-		// if(!menu_display){
-		// //获取LayoutInflater实例
-		// inflater =
-		// (LayoutInflater)this.getSystemService(LAYOUT_INFLATER_SERVICE);
-		// //这里的main布局是在inflate中加入的哦，以前都是直接this.setContentView()的吧？呵呵
-		// //该方法返回的是一个View的对象，是布局中的根
-		// layout = inflater.inflate(R.layout.main_menu, null);
-		//
-		// //下面我们要考虑了，我怎样将我的layout加入到PopupWindow中呢？？？很简单
-		// menuWindow = new PopupWindow(layout,LayoutParams.FILL_PARENT,
-		// LayoutParams.WRAP_CONTENT); //后两个参数是width和height
-		// //menuWindow.showAsDropDown(layout); //设置弹出效果
-		// //menuWindow.showAsDropDown(null, 0, layout.getHeight());
-		// menuWindow.showAtLocation(this.findViewById(R.id.mainweixin),
-		// Gravity.BOTTOM|Gravity.CENTER_HORIZONTAL, 0, 0);
-		// //设置layout在PopupWindow中显示的位置
-		// //如何获取我们main中的控件呢？也很简单
-		// mClose = (LinearLayout)layout.findViewById(R.id.menu_close);
-		// mCloseBtn = (LinearLayout)layout.findViewById(R.id.menu_close_btn);
-		//
-		//
-		// //下面对每一个Layout进行单击事件的注册吧。。。
-		// //比如单击某个MenuItem的时候，他的背景色改变
-		// //事先准备好一些背景图片或者颜色
-		// mCloseBtn.setOnClickListener (new View.OnClickListener() {
-		// @Override
-		// public void onClick(View arg0) {
-		// //Toast.makeText(Main.this, "退出", Toast.LENGTH_LONG).show();
-		// Intent intent = new Intent();
-		// intent.setClass(MainWeixin.this,Exit.class);
-		// startActivity(intent);
-		// menuWindow.dismiss(); //响应点击事件之后关闭Menu
-		// }
-		// });
-		// menu_display = true;
-		// }else{
-		// //如果当前已经为显示状态，则隐藏起来
-		// menuWindow.dismiss();
-		// menu_display = false;
-		// }
-		//
-		// return false;
-		// }
-		return false;
+		return super.onKeyDown(keyCode, event);
 	}
 
-	// //设置标题栏右侧按钮的作用
-	// public void btnmainright(View v) {
-	// Intent intent = new Intent (MainWeixin.this,MainTopRightDialog.class);
-	// startActivity(intent);
-	// //Toast.makeText(getApplicationContext(), "点击了功能按钮",
-	// Toast.LENGTH_LONG).show();
-	// }
-	// public void startchat(View v) { //小黑 对话界面
-	// Intent intent = new Intent (MainWeixin.this,ChatActivity.class);
-	// startActivity(intent);
-	// //Toast.makeText(getApplicationContext(), "登录成功",
-	// Toast.LENGTH_LONG).show();
-	// }
-	// public void exit_settings(View v) { //退出 伪“对话框”，其实是一个activity
-	// Intent intent = new Intent (MainWeixin.this,ExitFromSettings.class);
-	// startActivity(intent);
-	// }
-	// public void btn_shake(View v) { //手机摇一摇
-	// Intent intent = new Intent (MainWeixin.this,ShakeActivity.class);
-	// startActivity(intent);
-	// }
+	@Override
+	protected void onDestroy() {
+		super.onDestroy();
+		isRecording = false;
+		android.os.Process.killProcess(android.os.Process.myPid());
+	}
 
 	public void btnmainright(View view) {
 		isRecording = true;
+		updateRecUI();
 		new RecordPlayThread().start();// 开一条线程边录边放
+		startDealThread();
 		timer.schedule(new RecBpm(), 1000, 250);
 	}
 
@@ -381,14 +333,9 @@ public class MainActivity extends Activity {
 		public void run() {
 			int bpm = FetusCore.get();
 			Message msg = new Message();
-			showedList.add(bpm);
-			msg.obj = showedList;
-			handler.sendEmptyMessage(0);
-
-			Log.i("TAG", "***bpm=" + bpm + "***");
-
+			msg.arg1 = bpm;
+			handler.sendMessage(msg);
 		}
-
 	}
 
 	class RecordPlayThread extends Thread {
@@ -397,6 +344,7 @@ public class MainActivity extends Activity {
 				byte[] buffer = new byte[recBufSize];
 				audioRecord.startRecording();// 开始录制
 				audioTrack.play();// 开始播放
+				startWriteFile();
 
 				while (isRecording) {
 					// 从MIC保存数据到缓冲区
@@ -408,6 +356,7 @@ public class MainActivity extends Activity {
 					// 写入数据即播放
 					// Log.i("TAG","tmpBuf.length="+tmpBuf.length+"---");
 					FetusCore.put(tmpBuf, tmpBuf.length);
+					mOutputStream.write(tmpBuf);
 					audioTrack.write(tmpBuf, 0, tmpBuf.length);
 				}
 				audioTrack.stop();
@@ -435,16 +384,27 @@ public class MainActivity extends Activity {
 		localAudioManager.setMode(AudioManager.MODE_NORMAL);
 		if (localAudioManager.isWiredHeadsetOn())
 			localAudioManager.setSpeakerphoneOn(false);
+
+		// boolean isAvailable = AcousticEchoCanceler.isAvailable();
+		// if (isAvailable)
+		// {
+		// AcousticEchoCanceler aec =
+		// AcousticEchoCanceler.create(audioRecord.getAudioSessionId());
+		// if(!aec.getEnabled())
+		// aec.setEnabled(true);
+		// Log.i("DEBUG", " AEC enabled : " + aec.getEnabled() + " has control "
+		// + aec.hasControl());
+		// }
 	}
 
 	// 开启播放外放
 	private void setAudioOnSpeaker() {
 		AudioManager audioManager = (AudioManager) this
 				.getSystemService(Context.AUDIO_SERVICE);
-		audioManager.setMode(AudioManager.MODE_IN_CALL);
-		if (audioManager.isSpeakerphoneOn()) {
-			audioManager.setSpeakerphoneOn(false);// 使用扬声器外放，即使已经插入耳机
 
+		if (!audioManager.isSpeakerphoneOn()) {
+			audioManager.setSpeakerphoneOn(true);// 使用扬声器外放，即使已经插入耳机
+			audioManager.setMode(AudioManager.MODE_IN_CALL);
 			audioManager
 					.setStreamVolume(
 							AudioManager.STREAM_VOICE_CALL,
@@ -453,4 +413,38 @@ public class MainActivity extends Activity {
 							AudioManager.STREAM_VOICE_CALL);
 		}
 	}
+	
+	  private boolean createWriteFile()
+	  {
+	    File localFile = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/weiyu");
+	    if(!localFile.exists())
+	    {
+	    	localFile.mkdir();
+	    }
+	    if (localFile.canWrite())
+	    {
+	      try {
+			this.mWriteFile = File.createTempFile(temp, ".pcm", localFile);
+			return true;
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+	    }
+	    return false;
+	    
+	  }
+	  
+	  public boolean startWriteFile()
+	  {
+	    if (createWriteFile());
+	    {
+	      try {
+			this.mOutputStream = new FileOutputStream(this.mWriteFile);
+			return true;
+			} catch (FileNotFoundException e) {
+				e.printStackTrace();
+			}
+	    }
+	    return false;
+	  }
 }
