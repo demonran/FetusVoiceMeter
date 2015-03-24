@@ -5,6 +5,7 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -55,8 +56,8 @@ public class MainActivity extends Activity {
 	private LinearLayout play_ll;
 	private LinearLayout rec_ll;
 	private TextView rec_fq_num;
-	private boolean menu_display = false;
-	private PopupWindow menuWindow;
+	
+	private TextView rec_audio_time;
 
 	private HKRecordWaveView recordWaveView;
 	
@@ -75,6 +76,8 @@ public class MainActivity extends Activity {
 	AudioRecord audioRecord;
 	AudioTrack audioTrack;
 	Timer timer;
+	
+	private long writeFileStartTime;
 
 	private Handler handler = new Handler() {
 
@@ -89,6 +92,28 @@ public class MainActivity extends Activity {
 	};
 
 	private File mWriteFile;
+	
+	private Runnable mRecUpdateAudioTime = new Runnable()
+	  {
+	    DecimalFormat df = new DecimalFormat("00");
+
+	    public void run()
+	    {
+	      if (writeFileStartTime == 0)
+	        Log.e("TAG", "mUpdateAudioTime | mRecordingProcess is null!");
+	      else
+	      {
+	        long l = Math.round((float)((System.currentTimeMillis() - writeFileStartTime) / 1000L));
+	        String str1 = "%s:%s";
+	        Object[] arrayOfObject = new Object[2];
+	        arrayOfObject[0] = this.df.format(l / 60L);
+	        arrayOfObject[1] = this.df.format(l % 60L);
+	        String str2 = String.format(str1, arrayOfObject);
+	        rec_audio_time.setText(str2);
+	        handler.postDelayed(mRecUpdateAudioTime, 1000L);
+	      }
+	    }
+	  };
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -122,7 +147,7 @@ public class MainActivity extends Activity {
 		audioRecord = new AudioRecord(MediaRecorder.AudioSource.MIC, frequency,
 				channelConfiguration, audioEncoding, recBufSize);
 
-		audioTrack = new AudioTrack(AudioManager.STREAM_MUSIC, frequency,
+		audioTrack = new AudioTrack(AudioManager.STREAM_VOICE_CALL, frequency,
 				channelConfiguration, audioEncoding, playBufSize,
 				AudioTrack.MODE_STREAM);
 	}
@@ -150,6 +175,7 @@ public class MainActivity extends Activity {
 		LayoutInflater mLi = LayoutInflater.from(this);
 		View view1 = mLi.inflate(R.layout.main_tab_weixin, null);
 		recordWaveView = (HKRecordWaveView) view1.findViewById(R.id.rec_wave);
+		rec_audio_time = (TextView)view1.findViewById(R.id.rec_audio_time);
 		play_ll = (LinearLayout) view1.findViewById(R.id.play_ll);
 		rec_ll = (LinearLayout) view1.findViewById(R.id.rec_ll);
 		rec_fq_num = (TextView) view1.findViewById(R.id.rec_fq_num);
@@ -345,6 +371,7 @@ public class MainActivity extends Activity {
 				audioRecord.startRecording();// 开始录制
 				audioTrack.play();// 开始播放
 				startWriteFile();
+				writeFileStartTime = System.currentTimeMillis();
 
 				while (isRecording) {
 					// 从MIC保存数据到缓冲区
@@ -361,6 +388,7 @@ public class MainActivity extends Activity {
 				}
 				audioTrack.stop();
 				audioRecord.stop();
+				mOutputStream.close();
 			} catch (Throwable t) {
 				t.printStackTrace();
 				// Toast.makeText(MainActivity.this, t.getMessage(),
@@ -401,17 +429,15 @@ public class MainActivity extends Activity {
 	private void setAudioOnSpeaker() {
 		AudioManager audioManager = (AudioManager) this
 				.getSystemService(Context.AUDIO_SERVICE);
-
+//		audioManager.setMode(AudioManager.MODE_IN_CALL);
 		if (!audioManager.isSpeakerphoneOn()) {
 			audioManager.setSpeakerphoneOn(true);// 使用扬声器外放，即使已经插入耳机
-			audioManager.setMode(AudioManager.MODE_IN_CALL);
-			audioManager
-					.setStreamVolume(
+			audioManager.setStreamVolume(
 							AudioManager.STREAM_VOICE_CALL,
-							audioManager
-									.getStreamMaxVolume(AudioManager.STREAM_VOICE_CALL),
+							audioManager.getStreamMaxVolume(AudioManager.STREAM_VOICE_CALL),
 							AudioManager.STREAM_VOICE_CALL);
 		}
+		
 	}
 	
 	  private boolean createWriteFile()
@@ -440,6 +466,7 @@ public class MainActivity extends Activity {
 	    {
 	      try {
 			this.mOutputStream = new FileOutputStream(this.mWriteFile);
+			handler.post(mRecUpdateAudioTime);
 			return true;
 			} catch (FileNotFoundException e) {
 				e.printStackTrace();
