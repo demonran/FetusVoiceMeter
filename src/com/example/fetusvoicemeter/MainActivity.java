@@ -1,10 +1,6 @@
 package com.example.fetusvoicemeter;
 
 import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.OutputStream;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Timer;
@@ -12,14 +8,7 @@ import java.util.TimerTask;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
-import android.content.Context;
-import android.media.AudioFormat;
-import android.media.AudioManager;
-import android.media.AudioRecord;
-import android.media.AudioTrack;
-import android.media.MediaRecorder;
 import android.os.Bundle;
-import android.os.Environment;
 import android.os.Handler;
 import android.os.Message;
 import android.support.v4.view.PagerAdapter;
@@ -30,14 +19,15 @@ import android.view.Display;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.view.WindowManager;
 import android.view.animation.Animation;
 import android.view.animation.TranslateAnimation;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.PopupWindow;
 import android.widget.TextView;
 
+import com.example.fetusvoicemeter.recorder.RecordingProcess;
 import com.example.fetusvoicemeter.view.HKRecordWaveView;
 import com.fetus.FetusCore;
 
@@ -62,19 +52,14 @@ public class MainActivity extends Activity {
 	private HKRecordWaveView recordWaveView;
 	
 	private String temp = "recaudio_";// 临时文件前缀
-	private OutputStream mOutputStream;
+	
+	private RecordingProcess mRecProcess;
 	/**
 	 * 在画布上正在显示的数据集合
 	 */
 	private ArrayList<Integer> showedList = new ArrayList<Integer>();
 
-	boolean isRecording = false;// 是否录放的标记
-	static final int frequency = 44100;
-	static final int channelConfiguration = AudioFormat.CHANNEL_CONFIGURATION_MONO;
-	static final int audioEncoding = AudioFormat.ENCODING_PCM_16BIT;
-	int recBufSize, playBufSize;
-	AudioRecord audioRecord;
-	AudioTrack audioTrack;
+	
 	Timer timer;
 	
 	private long writeFileStartTime;
@@ -91,8 +76,6 @@ public class MainActivity extends Activity {
 
 	};
 
-	private File mWriteFile;
-	
 	private Runnable mRecUpdateAudioTime = new Runnable()
 	  {
 	    DecimalFormat df = new DecimalFormat("00");
@@ -115,6 +98,7 @@ public class MainActivity extends Activity {
 	    }
 	  };
 
+
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -125,8 +109,6 @@ public class MainActivity extends Activity {
 		instance = this;
 		initUI();
 
-		initRecord();
-		setAudioOnSpeaker();
 		// setAudioNormal();
 
 		FetusCore.init();
@@ -135,22 +117,6 @@ public class MainActivity extends Activity {
 
 	}
 
-	private void initRecord() {
-		recBufSize = AudioRecord.getMinBufferSize(frequency,
-				channelConfiguration, audioEncoding);
-		Log.i("TAG", "recBufSize=" + recBufSize + "---");
-
-		playBufSize = AudioTrack.getMinBufferSize(frequency,
-				channelConfiguration, audioEncoding);
-		Log.i("TAG", "playBufSize=" + playBufSize + "---");
-		// -----------------------------------------
-		audioRecord = new AudioRecord(MediaRecorder.AudioSource.MIC, frequency,
-				channelConfiguration, audioEncoding, recBufSize);
-
-		audioTrack = new AudioTrack(AudioManager.STREAM_VOICE_CALL, frequency,
-				channelConfiguration, audioEncoding, playBufSize,
-				AudioTrack.MODE_STREAM);
-	}
 
 	private void initUI() {
 		mTabPager = (ViewPager) findViewById(R.id.tabpager);
@@ -215,6 +181,16 @@ public class MainActivity extends Activity {
 		};
 
 		mTabPager.setAdapter(mPagerAdapter);
+		
+		recordWaveView.setOnClickListener(new OnClickListener() {
+			
+			@Override
+			public void onClick(View v) {
+				Log.i("TAG","view click..");
+				mRecProcess.stopAudioRecord();
+				
+			}
+		});
 	}
 
 	private void updateRecUI() {
@@ -341,16 +317,14 @@ public class MainActivity extends Activity {
 	@Override
 	protected void onDestroy() {
 		super.onDestroy();
-		isRecording = false;
 		android.os.Process.killProcess(android.os.Process.myPid());
 	}
 
 	public void btnmainright(View view) {
-		isRecording = true;
 		updateRecUI();
-		new RecordPlayThread().start();// 开一条线程边录边放
-		startDealThread();
-		timer.schedule(new RecBpm(), 1000, 250);
+		this.mRecProcess = new RecordingProcess(this);
+		mRecProcess.startAudioRecord(true);
+		timer.schedule(new RecBpm(), 1000, 1);
 	}
 
 	class RecBpm extends TimerTask {
@@ -364,114 +338,4 @@ public class MainActivity extends Activity {
 		}
 	}
 
-	class RecordPlayThread extends Thread {
-		public void run() {
-			try {
-				byte[] buffer = new byte[recBufSize];
-				audioRecord.startRecording();// 开始录制
-				audioTrack.play();// 开始播放
-				startWriteFile();
-				writeFileStartTime = System.currentTimeMillis();
-
-				while (isRecording) {
-					// 从MIC保存数据到缓冲区
-					int bufferReadResult = audioRecord.read(buffer, 0,
-							recBufSize);
-
-					byte[] tmpBuf = new byte[bufferReadResult];
-					System.arraycopy(buffer, 0, tmpBuf, 0, bufferReadResult);
-					// 写入数据即播放
-					// Log.i("TAG","tmpBuf.length="+tmpBuf.length+"---");
-					FetusCore.put(tmpBuf, tmpBuf.length);
-					mOutputStream.write(tmpBuf);
-					audioTrack.write(tmpBuf, 0, tmpBuf.length);
-				}
-				audioTrack.stop();
-				audioRecord.stop();
-				mOutputStream.close();
-			} catch (Throwable t) {
-				t.printStackTrace();
-				// Toast.makeText(MainActivity.this, t.getMessage(),
-				// Toast.LENGTH_LONG).show();
-			}
-		}
-	};
-
-	private void startDealThread() {
-		new Thread() {
-			public void run() {
-				FetusCore.deal();
-			}
-		}.start();
-	}
-
-	private void setAudioNormal() {
-		AudioManager localAudioManager = (AudioManager) this
-				.getSystemService(Context.AUDIO_SERVICE);
-		Log.i("TAG", localAudioManager.isSpeakerphoneOn() + "**");
-		localAudioManager.setMode(AudioManager.MODE_NORMAL);
-		if (localAudioManager.isWiredHeadsetOn())
-			localAudioManager.setSpeakerphoneOn(false);
-
-		// boolean isAvailable = AcousticEchoCanceler.isAvailable();
-		// if (isAvailable)
-		// {
-		// AcousticEchoCanceler aec =
-		// AcousticEchoCanceler.create(audioRecord.getAudioSessionId());
-		// if(!aec.getEnabled())
-		// aec.setEnabled(true);
-		// Log.i("DEBUG", " AEC enabled : " + aec.getEnabled() + " has control "
-		// + aec.hasControl());
-		// }
-	}
-
-	// 开启播放外放
-	private void setAudioOnSpeaker() {
-		AudioManager audioManager = (AudioManager) this
-				.getSystemService(Context.AUDIO_SERVICE);
-//		audioManager.setMode(AudioManager.MODE_IN_CALL);
-		if (!audioManager.isSpeakerphoneOn()) {
-			audioManager.setSpeakerphoneOn(true);// 使用扬声器外放，即使已经插入耳机
-			audioManager.setStreamVolume(
-							AudioManager.STREAM_VOICE_CALL,
-							audioManager.getStreamMaxVolume(AudioManager.STREAM_VOICE_CALL),
-							AudioManager.STREAM_VOICE_CALL);
-		}
-		
-	}
-	
-	  private boolean createWriteFile()
-	  {
-	    File localFile = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/weiyu");
-	    if(!localFile.exists())
-	    {
-	    	localFile.mkdir();
-	    }
-	    if (localFile.canWrite())
-	    {
-	      try {
-			this.mWriteFile = File.createTempFile(temp, ".pcm", localFile);
-			return true;
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-	    }
-	    return false;
-	    
-	  }
-	  
-	  public boolean startWriteFile()
-	  {
-	    if (createWriteFile());
-	    {
-	      try {
-			this.mOutputStream = new FileOutputStream(this.mWriteFile);
-			handler.post(mRecUpdateAudioTime);
-			return true;
-			} catch (FileNotFoundException e) {
-				e.printStackTrace();
-			}
-	    }
-	    return false;
-	  }
 }
