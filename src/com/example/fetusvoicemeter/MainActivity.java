@@ -51,8 +51,6 @@ public class MainActivity extends Activity {
 
 	private HKRecordWaveView recordWaveView;
 	
-	private String temp = "recaudio_";// 临时文件前缀
-	
 	private RecordingProcess mRecProcess;
 	/**
 	 * 在画布上正在显示的数据集合
