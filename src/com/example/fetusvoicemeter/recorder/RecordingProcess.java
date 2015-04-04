@@ -59,7 +59,7 @@ public class RecordingProcess {
 	}
 
 	public void startAudioRecord(boolean paramBoolean) {
-		if (this.audioRecord == null)
+		if (this.audioRecord != null)
 			try {
 				this.audioRecord.startRecording();
 				this.isRecording = true;
@@ -105,16 +105,17 @@ public class RecordingProcess {
 	public boolean startWriteFile() {
 		boolean bool = false;
 		if (createWriteFile())
-			;
-		try {
-			this.mOutputStream = new FileOutputStream(this.mWriteFile);
-			this.mWriteFileStartTime = System.currentTimeMillis();
-			this.mIsWriteFile = true;
-			bool = true;
-			return bool;
-		} catch (FileNotFoundException localFileNotFoundException) {
+		{
+			try {
+				this.mOutputStream = new FileOutputStream(this.mWriteFile);
+				this.mWriteFileStartTime = System.currentTimeMillis();
+				this.mIsWriteFile = true;
+				bool = true;
+			} catch (FileNotFoundException e) {
+			}
 		}
-		return true;
+		
+		return bool;
 	}
 
 	private boolean createWriteFile() {
@@ -168,5 +169,10 @@ public class RecordingProcess {
 	{
 		 this.isRecording = false;
 	      this.audioRecord.stop();
+	}
+	
+	public boolean isStarted()
+	{
+		return this.isRecording;
 	}
 }

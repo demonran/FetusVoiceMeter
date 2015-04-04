@@ -1,8 +1,9 @@
 package com.example.fetusvoicemeter;
 
-import java.io.File;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -25,6 +26,9 @@ import android.view.animation.Animation;
 import android.view.animation.TranslateAnimation;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.ListView;
+import android.widget.RelativeLayout;
+import android.widget.SimpleAdapter;
 import android.widget.TextView;
 
 import com.example.fetusvoicemeter.recorder.RecordingProcess;
@@ -43,23 +47,29 @@ public class MainActivity extends Activity {
 	private int one;// 单个水平动画位移
 	private int two;
 	private int three;
-	private LinearLayout play_ll;
+	private RelativeLayout play_lr;
 	private LinearLayout rec_ll;
+	private LinearLayout stop_ll;
+	private LinearLayout save_ll;
 	private TextView rec_fq_num;
-	
+
 	private TextView rec_audio_time;
 
 	private HKRecordWaveView recordWaveView;
-	
+
 	private RecordingProcess mRecProcess;
+
+	private ListView listview;
+	private TextView emptyView;
 	/**
 	 * 在画布上正在显示的数据集合
 	 */
 	private ArrayList<Integer> showedList = new ArrayList<Integer>();
 
-	
+	private List<Map<String, Object>> data = new ArrayList<Map<String, Object>>();
+
 	Timer timer;
-	
+
 	private long writeFileStartTime;
 
 	private Handler handler = new Handler() {
@@ -74,28 +84,25 @@ public class MainActivity extends Activity {
 
 	};
 
-	private Runnable mRecUpdateAudioTime = new Runnable()
-	  {
-	    DecimalFormat df = new DecimalFormat("00");
+	private Runnable mRecUpdateAudioTime = new Runnable() {
+		DecimalFormat df = new DecimalFormat("00");
 
-	    public void run()
-	    {
-	      if (writeFileStartTime == 0)
-	        Log.e("TAG", "mUpdateAudioTime | mRecordingProcess is null!");
-	      else
-	      {
-	        long l = Math.round((float)((System.currentTimeMillis() - writeFileStartTime) / 1000L));
-	        String str1 = "%s:%s";
-	        Object[] arrayOfObject = new Object[2];
-	        arrayOfObject[0] = this.df.format(l / 60L);
-	        arrayOfObject[1] = this.df.format(l % 60L);
-	        String str2 = String.format(str1, arrayOfObject);
-	        rec_audio_time.setText(str2);
-	        handler.postDelayed(mRecUpdateAudioTime, 1000L);
-	      }
-	    }
-	  };
-
+		public void run() {
+			if (writeFileStartTime == 0)
+				Log.e("TAG", "mUpdateAudioTime | mRecordingProcess is null!");
+			else {
+				long l = Math
+						.round((float) ((System.currentTimeMillis() - writeFileStartTime) / 1000L));
+				String str1 = "%s:%s";
+				Object[] arrayOfObject = new Object[2];
+				arrayOfObject[0] = this.df.format(l / 60L);
+				arrayOfObject[1] = this.df.format(l % 60L);
+				String str2 = String.format(str1, arrayOfObject);
+				rec_audio_time.setText(str2);
+				handler.postDelayed(mRecUpdateAudioTime, 1000L);
+			}
+		}
+	};
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -114,7 +121,6 @@ public class MainActivity extends Activity {
 		timer = new Timer();
 
 	}
-
 
 	private void initUI() {
 		mTabPager = (ViewPager) findViewById(R.id.tabpager);
@@ -139,11 +145,21 @@ public class MainActivity extends Activity {
 		LayoutInflater mLi = LayoutInflater.from(this);
 		View view1 = mLi.inflate(R.layout.main_tab_weixin, null);
 		recordWaveView = (HKRecordWaveView) view1.findViewById(R.id.rec_wave);
-		rec_audio_time = (TextView)view1.findViewById(R.id.rec_audio_time);
-		play_ll = (LinearLayout) view1.findViewById(R.id.play_ll);
+		rec_audio_time = (TextView) view1.findViewById(R.id.rec_audio_time);
+		play_lr = (RelativeLayout) view1.findViewById(R.id.play_rl);
+		stop_ll = (LinearLayout) view1.findViewById(R.id.stop_ll);
+		save_ll = (LinearLayout) view1.findViewById(R.id.save_ll);
 		rec_ll = (LinearLayout) view1.findViewById(R.id.rec_ll);
 		rec_fq_num = (TextView) view1.findViewById(R.id.rec_fq_num);
+
 		View view2 = mLi.inflate(R.layout.main_tab_address, null);
+		emptyView = (TextView)view2.findViewById(R.id.empty);
+		listview = (ListView) view2.findViewById(R.id.listview);
+
+		listview.setAdapter(new SimpleAdapter(this, data, R.layout.list_item,
+				new String[] { "fileName", "createTime", "btn_detele" },
+				new int[] { R.id.fileName, R.id.createtime, R.id.Bt_delete }));
+
 		View view3 = mLi.inflate(R.layout.main_tab_friends, null);
 		View view4 = mLi.inflate(R.layout.main_tab_settings, null);
 
@@ -179,20 +195,26 @@ public class MainActivity extends Activity {
 		};
 
 		mTabPager.setAdapter(mPagerAdapter);
-		
-		recordWaveView.setOnClickListener(new OnClickListener() {
-			
+
+		stop_ll.setOnClickListener(new OnClickListener() {
+
 			@Override
 			public void onClick(View v) {
-				Log.i("TAG","view click..");
-				mRecProcess.stopAudioRecord();
-				
+
+				if (mRecProcess != null && mRecProcess.isStarted()) {
+					Log.i("TAG", "stop_ll ON cliclk" + mRecProcess.isStarted());
+					mRecProcess.stopAudioRecord();
+					stop_ll.setVisibility(View.GONE);
+					save_ll.setVisibility(View.VISIBLE);
+				}
+
 			}
 		});
+
 	}
 
 	private void updateRecUI() {
-		play_ll.setVisibility(View.GONE);
+		play_lr.setVisibility(View.GONE);
 		rec_ll.setVisibility(View.VISIBLE);
 	}
 
@@ -227,6 +249,7 @@ public class MainActivity extends Activity {
 					animation = new TranslateAnimation(one, 0, 0, 0);
 					mTab2.setImageDrawable(getResources().getDrawable(
 							R.drawable.tab_recored_normal));
+					updateRecordUI();
 				} else if (currIndex == 2) {
 					animation = new TranslateAnimation(two, 0, 0, 0);
 					mTab3.setImageDrawable(getResources().getDrawable(
@@ -301,6 +324,26 @@ public class MainActivity extends Activity {
 		@Override
 		public void onPageScrollStateChanged(int arg0) {
 		}
+	}
+	
+	
+	private void updateRecordUI()
+	{
+		refleshData();
+		if(data.size()==0)
+		{
+			listview.setVisibility(View.GONE);
+			emptyView.setVisibility(View.VISIBLE);
+		}else
+		{
+			listview.setVisibility(View.VISIBLE);
+			emptyView.setVisibility(View.GONE);
+		}
+	}
+	
+	private void refleshData()
+	{
+		
 	}
 
 	@Override
