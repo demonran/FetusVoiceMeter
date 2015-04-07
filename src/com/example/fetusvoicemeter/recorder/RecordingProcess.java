@@ -6,6 +6,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 
+import com.example.fetusvoicemeter.entity.RecorderEntity;
 import com.example.fetusvoicemeter.utils.HKCommonUtils;
 import com.fetus.FetusCore;
 
@@ -32,9 +33,16 @@ public class RecordingProcess {
 
 	private OutputStream mOutputStream;
 	private File mWriteFile;
-	private long mWriteFileStartTime;
-	private boolean mIsWriteFile;
-	private long mWriteFileTimeLen;
+	
+	private RecorderEntity recorderEntity;
+
+	public RecorderEntity getRecorderEntity() {
+		return recorderEntity;
+	}
+
+	public void setRecorderEntity(RecorderEntity recorderEntity) {
+		this.recorderEntity = recorderEntity;
+	}
 
 	public RecordingProcess(Context context) {
 		mContext = context;
@@ -76,7 +84,7 @@ public class RecordingProcess {
 				byte[] buffer = new byte[recBufSize];
 				audioRecord.startRecording();// 开始录制
 				audioTrack.play();// 开始播放
-				// startWriteFile();
+				 startWriteFile();
 
 				while (isRecording) {
 					// 从MIC保存数据到缓冲区
@@ -108,25 +116,23 @@ public class RecordingProcess {
 		{
 			try {
 				this.mOutputStream = new FileOutputStream(this.mWriteFile);
-				this.mWriteFileStartTime = System.currentTimeMillis();
-				this.mIsWriteFile = true;
+				recorderEntity.setStartTime(System.currentTimeMillis());
 				bool = true;
 			} catch (FileNotFoundException e) {
 			}
 		}
-		
 		return bool;
 	}
 
 	private boolean createWriteFile() {
-		File localFile = Environment.getExternalStorageDirectory();
-		if (localFile.canWrite())
-			;
+		String recirderFilePath = HKCommonUtils.getRecorderFile();
+		if(recirderFilePath != null)
 		{
-			this.mWriteFile = new File(localFile + File.separator + "weiyu"
-					+ HKCommonUtils.getTimeString() + ".pcm");
+			recorderEntity = new RecorderEntity();
+			this.mWriteFile = new File(HKCommonUtils.getRecorderFile());
+			return true;
 		}
-		return true;
+		return false;
 	}
 
 	private void startDealThread() {
@@ -160,15 +166,16 @@ public class RecordingProcess {
 	}
 
 	public void stopWriteFile() {
-		this.mWriteFileTimeLen = (System.currentTimeMillis() - this.mWriteFileStartTime);
-		this.mIsWriteFile = false;
-		stopAudioRecord();
+		recorderEntity.setDurationTime(System.currentTimeMillis() - recorderEntity.getStartTime());
+		recorderEntity.setName(HKCommonUtils.getTimeString());
+		HKCommonUtils.writeXml(recorderEntity);
 	}
 	
 	public void stopAudioRecord()
 	{
-		 this.isRecording = false;
-	      this.audioRecord.stop();
+		stopWriteFile();
+		this.isRecording = false;
+	    this.audioRecord.stop();
 	}
 	
 	public boolean isStarted()

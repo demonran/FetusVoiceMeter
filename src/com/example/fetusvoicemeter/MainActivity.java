@@ -2,6 +2,8 @@ package com.example.fetusvoicemeter;
 
 import java.text.DecimalFormat;
 import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Timer;
@@ -24,6 +26,7 @@ import android.view.View.OnClickListener;
 import android.view.WindowManager;
 import android.view.animation.Animation;
 import android.view.animation.TranslateAnimation;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
@@ -54,6 +57,8 @@ public class MainActivity extends Activity {
 	private TextView rec_fq_num;
 
 	private TextView rec_audio_time;
+	
+	private EditText et_SaveName;
 
 	private HKRecordWaveView recordWaveView;
 
@@ -151,11 +156,32 @@ public class MainActivity extends Activity {
 		save_ll = (LinearLayout) view1.findViewById(R.id.save_ll);
 		rec_ll = (LinearLayout) view1.findViewById(R.id.rec_ll);
 		rec_fq_num = (TextView) view1.findViewById(R.id.rec_fq_num);
+		
+		view1.findViewById(R.id.Bt_save).setOnClickListener(new OnClickListener() {
+			
+			@Override
+			public void onClick(View v) {
+				updateRecUI();
+				mTabPager.setCurrentItem(1);
+				
+			}
+		});
+		
+		view1.findViewById(R.id.Bt_quit).setOnClickListener(new OnClickListener() {
+			
+			@Override
+			public void onClick(View v) {
+				updateRecUI();
+				
+			}
+		});
 
+		et_SaveName = (EditText)view1.findViewById(R.id.ET_SaveName);
 		View view2 = mLi.inflate(R.layout.main_tab_address, null);
 		emptyView = (TextView)view2.findViewById(R.id.empty);
 		listview = (ListView) view2.findViewById(R.id.listview);
-
+		
+		
 		listview.setAdapter(new SimpleAdapter(this, data, R.layout.list_item,
 				new String[] { "fileName", "createTime", "btn_detele" },
 				new int[] { R.id.fileName, R.id.createtime, R.id.Bt_delete }));
@@ -204,6 +230,7 @@ public class MainActivity extends Activity {
 				if (mRecProcess != null && mRecProcess.isStarted()) {
 					Log.i("TAG", "stop_ll ON cliclk" + mRecProcess.isStarted());
 					mRecProcess.stopAudioRecord();
+					et_SaveName.setText(mRecProcess.getRecorderEntity().getName());
 					stop_ll.setVisibility(View.GONE);
 					save_ll.setVisibility(View.VISIBLE);
 				}
@@ -214,8 +241,19 @@ public class MainActivity extends Activity {
 	}
 
 	private void updateRecUI() {
-		play_lr.setVisibility(View.GONE);
-		rec_ll.setVisibility(View.VISIBLE);
+		Log.i("TAG",mRecProcess+"");
+		stop_ll.setVisibility(View.VISIBLE);
+		save_ll.setVisibility(View.GONE);
+		if(mRecProcess != null && mRecProcess.isStarted())
+		{
+			play_lr.setVisibility(View.GONE);
+			rec_ll.setVisibility(View.VISIBLE);
+		}else
+		{
+			play_lr.setVisibility(View.VISIBLE);
+			rec_ll.setVisibility(View.GONE);
+		}
+		
 	}
 
 	/**
@@ -249,7 +287,6 @@ public class MainActivity extends Activity {
 					animation = new TranslateAnimation(one, 0, 0, 0);
 					mTab2.setImageDrawable(getResources().getDrawable(
 							R.drawable.tab_recored_normal));
-					updateRecordUI();
 				} else if (currIndex == 2) {
 					animation = new TranslateAnimation(two, 0, 0, 0);
 					mTab3.setImageDrawable(getResources().getDrawable(
@@ -261,6 +298,8 @@ public class MainActivity extends Activity {
 				}
 				break;
 			case 1:
+				Log.i("TAG","case 1");
+				updateRecordUI();
 				mTab2.setImageDrawable(getResources().getDrawable(
 						R.drawable.tab_recored_pressed));
 				if (currIndex == 0) {
@@ -343,7 +382,12 @@ public class MainActivity extends Activity {
 	
 	private void refleshData()
 	{
-		
+		Map<String,Object> map = new HashMap<String,Object>();
+//		"fileName", "createTime", "btn_detele"
+		map.put("fileName", mRecProcess.getRecorderEntity().getName());
+		map.put("createTime", new Date());
+		map.put("btn_detele", null);
+		data.add(map);
 	}
 
 	@Override
@@ -362,9 +406,10 @@ public class MainActivity extends Activity {
 	}
 
 	public void btnmainright(View view) {
-		updateRecUI();
+		
 		this.mRecProcess = new RecordingProcess(this);
 		mRecProcess.startAudioRecord(true);
+		updateRecUI();
 		timer.schedule(new RecBpm(), 1000, 1);
 	}
 
