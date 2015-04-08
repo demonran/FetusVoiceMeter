@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.List;
 import java.util.Locale;
 
 import javax.xml.parsers.DocumentBuilder;
@@ -26,7 +27,7 @@ import com.example.fetusvoicemeter.entity.RecorderEntity;
 
 public class Utils {
 	
-	private static SimpleDateFormat localSimpleDateFormat = new SimpleDateFormat("yyyy年MM月dd日 HH:mm:ss",Locale.getDefault());
+	private static SimpleDateFormat localSimpleDateFormat = new SimpleDateFormat("yyyyMMddHHmmss",Locale.getDefault());
 
 	private static File  localFile = Environment.getExternalStorageDirectory();
 	
@@ -41,9 +42,15 @@ public class Utils {
 		return localSimpleDateFormat.format(new Date());
 	}
 	
+	public static String getTimeString(String format) {
+		SimpleDateFormat sdf = new SimpleDateFormat(format,Locale.getDefault());
+		return sdf.format(new Date());
+	}
+	
 	public static String millis2CalendarString(long time)
 	{
-		return localSimpleDateFormat.format(new Date(time));
+		SimpleDateFormat sdf = new SimpleDateFormat("yyyy年MM月dd日 HH:mm:ss",Locale.getDefault());
+		return sdf.format(new Date(time));
 	}
 	
 	public static void deleteFile(File file)
@@ -167,7 +174,7 @@ public class Utils {
 	public  static <T> String arrayToString(T[] arrays)
 	{
 		
-		if(arrays.length ==0)
+		if(arrays == null || arrays.length ==0)
 		{
 			return "";
 		}
@@ -182,8 +189,7 @@ public class Utils {
 	
 	public  static Float[] stringToFloatArray(String str)
 	{
-		
-		if(str == null)
+		if(str == null || str.isEmpty())
 		{
 			return null;
 		}
@@ -200,7 +206,7 @@ public class Utils {
 	public  static Integer[] stringToIntegerArray(String str)
 	{
 		
-		if(str == null)
+		if(str == null || str.isEmpty())
 		{
 			return null;
 		}
@@ -213,6 +219,62 @@ public class Utils {
 		
 		return arr;
 	}
+
+	public static int getMinFromArray(Integer[] arr) {
+		if(arr == null || arr.length == 0)
+		{
+			return 0;
+		}
+		int min = arr[0];
+		for(int i : arr)
+		{
+			if(min > i)
+			{
+				min = i;
+			}
+		}
+		return min;
+	}
+	
+	public static int getMaxFromArray(Integer[] arr) {
+		if(arr == null || arr.length == 0)
+		{
+			return 0;
+		}
+		int max = arr[0];
+		for(int i : arr)
+		{
+			if(max < i)
+			{
+				max = i;
+			}
+		}
+		return max;
+	}
+	
+	public static int getAverageFromArray(Integer[] arr) {
+		if(arr == null || arr.length == 0)
+		{
+			return 0;
+		}
+		int sum = 0 ;
+		for(int i : arr)
+		{
+			sum += i;
+		}
+		return sum/arr.length;
+	}
+
+//	public static <T> T[]  listToArray(List<T> list) {
+//		list.toArray(array)
+//		T[] t = new T[1];
+//		if(list == null || list.isEmpty())
+//		{
+//			return new T[]{};
+//		}
+//		return null;
+//	}
+
 
 
 }

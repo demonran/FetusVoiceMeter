@@ -250,27 +250,27 @@
                         android:src="@drawable/heart" />
 
                     <TextView
+                        android:id="@+id/maxBeat"
                         android:layout_width="fill_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="39.0dip"
                         android:gravity="right"
-                        android:text="160"
                         android:textColor="#ffff6633" />
 
                     <TextView
+                        android:id="@+id/averageBeat"
                         android:layout_width="fill_parent"
                         android:layout_height="wrap_content"
                         android:gravity="center_horizontal"
-                        android:text="120"
                         android:textColor="#ff68f4ff"
                         android:textSize="35.0dip" />
 
                     <TextView
+                         android:id="@+id/minBeat"
                         android:layout_width="fill_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="10.0dip"
                         android:gravity="right"
-                        android:text="110"
                         android:textColor="#ffff6633" />
                 </LinearLayout>
             </LinearLayout>

@@ -59,6 +59,10 @@ public class MainActivity extends Activity {
 	private LinearLayout save_ll;
 	private LinearLayout playRec_ll;
 	
+	private TextView et_minBeat;
+	private TextView et_maxBeat;
+	private TextView et_averageBeat;
+	
 	private TextView rec_fq_num;
 
 	private TextView rec_audio_time;
@@ -127,6 +131,7 @@ public class MainActivity extends Activity {
 				WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
 		instance = this;
 		recorderDao = RecorderDAO.createChatMsgDAO(this);
+		this.mRecProcess = new RecordingProcess(this);
 		initUI();
 
 		// setAudioNormal();
@@ -167,13 +172,18 @@ public class MainActivity extends Activity {
 		rec_ll = (LinearLayout) view1.findViewById(R.id.rec_ll);
 		playRec_ll = (LinearLayout) view1.findViewById(R.id.playRec_ll);
 		rec_fq_num = (TextView) view1.findViewById(R.id.rec_fq_num);
-
+		
+		et_minBeat = (TextView) view1.findViewById(R.id.minBeat);
+		et_maxBeat = (TextView) view1.findViewById(R.id.maxBeat);
+		et_averageBeat = (TextView) view1.findViewById(R.id.averageBeat);
+		
 		view1.findViewById(R.id.Bt_save).setOnClickListener(
 				new OnClickListener() {
 
 					@Override
 					public void onClick(View v) {
 						status = Status.STOP;
+						recorderDao.insertData(mRecProcess.getRecorderEntity());
 						mTabPager.setCurrentItem(1);
 
 					}
@@ -185,6 +195,7 @@ public class MainActivity extends Activity {
 					@Override
 					public void onClick(View v) {
 						status = Status.STOP;
+						mRecProcess.deletePcmFile();
 						updateRecordUI();
 
 					}
@@ -203,8 +214,12 @@ public class MainActivity extends Activity {
 			public void onItemClick(AdapterView<?> parent, View view,
 					int position, long id) {
 				File file = recordAdapter.getItem(position);
+				mRecProcess.startAudioPlay(file);
 				String name = file.getName();
 				RecorderEntity recorderEntity = recorderDao.getData(name);
+				et_minBeat.setText(Utils.getMinFromArray(recorderEntity.getBeatValues())+"");
+				et_maxBeat.setText(Utils.getMaxFromArray(recorderEntity.getBeatValues())+"");
+				et_averageBeat.setText(Utils.getAverageFromArray(recorderEntity.getBeatValues())+"");
 				status = Status.PLAY;
 				mTabPager.setCurrentItem(0);
 				
@@ -253,11 +268,13 @@ public class MainActivity extends Activity {
 			@Override
 			public void onClick(View v) {
 
-				if (mRecProcess != null && mRecProcess.isStarted()) {
+				if (mRecProcess != null && mRecProcess.isStarted() && status == Status.RECORD) {
 					Log.i("TAG", "stop_ll ON cliclk" + mRecProcess.isStarted());
 					mRecProcess.stopAudioRecord();
 					et_SaveName.setText(mRecProcess.getRecorderEntity()
 							.getName());
+					Integer[] contents = new Integer[showedList.size()];
+					mRecProcess.getRecorderEntity().setBeatValues(showedList.toArray(contents));
 					status = Status.SAVE;
 					updateRecordUI();
 				}
@@ -451,7 +468,7 @@ public class MainActivity extends Activity {
 
 	public void btnmainright(View view) {
 
-		this.mRecProcess = new RecordingProcess(this);
+		showedList.clear();
 		mRecProcess.startAudioRecord(true);
 		status = Status.RECORD;
 		updateRecordUI();

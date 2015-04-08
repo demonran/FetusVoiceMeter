@@ -1,5 +1,7 @@
 package com.example.fetusvoicemeter.entity;
 
+import java.util.Arrays;
+
 public class RecorderEntity {
 	
 	
@@ -67,6 +69,14 @@ public class RecorderEntity {
 
 	public void setStartTime(long startTime) {
 		this.startTime = startTime;
+	}
+
+	@Override
+	public String toString() {
+		return "RecorderEntity [name=" + name + ", beatValues="
+				+ Arrays.toString(beatValues) + ", beatTimes="
+				+ Arrays.toString(beatTimes) + ", durationTime=" + durationTime
+				+ ", startTime=" + startTime + "]";
 	}
 
 

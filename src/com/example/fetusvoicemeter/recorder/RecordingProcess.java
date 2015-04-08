@@ -1,11 +1,13 @@
 package com.example.fetusvoicemeter.recorder;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 
+import com.example.fetusvoicemeter.db.RecorderDAO;
 import com.example.fetusvoicemeter.entity.RecorderEntity;
 import com.example.fetusvoicemeter.utils.Utils;
 import com.fetus.FetusCore;
@@ -30,7 +32,7 @@ public class RecordingProcess {
 	int recBufSize, playBufSize;
 	AudioRecord audioRecord;
 	AudioTrack audioTrack;
-
+	
 	private OutputStream mOutputStream;
 	private File mWriteFile;
 	
@@ -69,6 +71,7 @@ public class RecordingProcess {
 	public void startAudioRecord(boolean paramBoolean) {
 		if (this.audioRecord != null)
 			try {
+				startDealThread();
 				this.audioRecord.startRecording();
 				this.isRecording = true;
 				if (paramBoolean) {
@@ -97,13 +100,55 @@ public class RecordingProcess {
 					// Log.i("TAG","tmpBuf.length="+tmpBuf.length+"---");
 					// audioTrack.write(buffer, 0, bufferReadResult);
 					audioTrack.write(tmpBuf, 0, tmpBuf.length);
-					// FetusCore.put(tmpBuf, tmpBuf.length);
-					// mOutputStream.write(tmpBuf);
+					 FetusCore.put(tmpBuf, tmpBuf.length);
+					 mOutputStream.write(tmpBuf);
 
 				}
 				audioTrack.stop();
 				audioRecord.stop();
 				mOutputStream.close();
+			} catch (Throwable t) {
+				t.printStackTrace();
+			}
+		}
+	}
+	
+	public void startAudioPlay(File pcmFile) {
+		if (this.audioTrack != null){
+			audioTrack.play();// 开始播放
+			try {
+				this.isRecording = true;
+				new PlayThread(pcmFile).start();// 开一条线程边录边放
+			} catch (Exception e) {
+			}
+		}
+			
+	}
+	
+	class PlayThread extends Thread {
+		
+		public File pcmFile ;
+		
+		public PlayThread(File pcmFile)
+		{
+			this.pcmFile = pcmFile;
+		}
+		
+		public void run() {
+			try {
+				byte[] buffer = new byte[playBufSize];
+				audioTrack.play();// 开始播放
+				FileInputStream fis = new FileInputStream(pcmFile);
+				int len = -1;
+				while ((len= fis.read(buffer))!= -1) {
+					byte[] tmpBuf = new byte[len];
+					System.arraycopy(buffer, 0, tmpBuf, 0, len);
+					// 写入数据即播放
+					audioTrack.write(tmpBuf, 0, tmpBuf.length);
+
+				}
+				fis.close();
+				audioTrack.stop();
 			} catch (Throwable t) {
 				t.printStackTrace();
 			}
@@ -167,8 +212,8 @@ public class RecordingProcess {
 
 	public void stopWriteFile() {
 		recorderEntity.setDurationTime(System.currentTimeMillis() - recorderEntity.getStartTime());
-		recorderEntity.setName(Utils.getTimeString());
-		Utils.writeXml(recorderEntity);
+		recorderEntity.setName(mWriteFile.getName());
+//		Utils.writeXml(recorderEntity);
 	}
 	
 	public void stopAudioRecord()
@@ -181,5 +226,10 @@ public class RecordingProcess {
 	public boolean isStarted()
 	{
 		return this.isRecording;
+	}
+
+	public void deletePcmFile() {
+		mWriteFile.delete();
+		
 	}
 }

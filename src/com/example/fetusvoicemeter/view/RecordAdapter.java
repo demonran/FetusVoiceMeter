@@ -64,8 +64,9 @@ public class RecordAdapter extends BaseAdapter {
 				.findViewById(R.id.createtime);
 		final File localFile = getItem(position);
 		localTextView1.setText(localFile.getName());
-		localTextView2.setText(Utils.millis2CalendarString(localFile
-				.lastModified()));
+//		localTextView2.setText(Utils.millis2CalendarString(localFile
+//				.lastModified()));
+		localTextView2.setText(localFile.length()+"");
 		((Button) localView.findViewById(R.id.Bt_delete))
 				.setOnClickListener(new OnClickListener() {
 

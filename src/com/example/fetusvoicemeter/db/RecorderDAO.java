@@ -65,7 +65,7 @@ public class RecorderDAO {
 		ContentValues values = new ContentValues();
 		values.put("name", entity.getName());
 		values.put("beatValues", Utils.arrayToString(entity.getBeatValues()));
-		values.put("beatTimes", Utils.arrayToString(entity.getBeatTimes()));
+		values.put("beatTimes", entity.getBeatTimes()==null?"":Utils.arrayToString(entity.getBeatTimes()));
 		values.put("durationTime", entity.getDurationTime());
 		values.put("startTime", entity.getStartTime());
 		db.insert("record", null, values);
