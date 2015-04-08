@@ -7,7 +7,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 
 import com.example.fetusvoicemeter.entity.RecorderEntity;
-import com.example.fetusvoicemeter.utils.HKCommonUtils;
+import com.example.fetusvoicemeter.utils.Utils;
 import com.fetus.FetusCore;
 
 import android.content.Context;
@@ -125,11 +125,11 @@ public class RecordingProcess {
 	}
 
 	private boolean createWriteFile() {
-		String recirderFilePath = HKCommonUtils.getRecorderFile();
+		String recirderFilePath = Utils.getRecorderFile();
 		if(recirderFilePath != null)
 		{
 			recorderEntity = new RecorderEntity();
-			this.mWriteFile = new File(HKCommonUtils.getRecorderFile());
+			this.mWriteFile = new File(Utils.getRecorderFile());
 			return true;
 		}
 		return false;
@@ -167,8 +167,8 @@ public class RecordingProcess {
 
 	public void stopWriteFile() {
 		recorderEntity.setDurationTime(System.currentTimeMillis() - recorderEntity.getStartTime());
-		recorderEntity.setName(HKCommonUtils.getTimeString());
-		HKCommonUtils.writeXml(recorderEntity);
+		recorderEntity.setName(Utils.getTimeString());
+		Utils.writeXml(recorderEntity);
 	}
 	
 	public void stopAudioRecord()

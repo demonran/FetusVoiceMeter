@@ -24,16 +24,31 @@ import android.os.Environment;
 
 import com.example.fetusvoicemeter.entity.RecorderEntity;
 
-public class HKCommonUtils {
+public class Utils {
 	
-	private static SimpleDateFormat localSimpleDateFormat = new SimpleDateFormat("yyyyMMddHHmmss",Locale.getDefault());
+	private static SimpleDateFormat localSimpleDateFormat = new SimpleDateFormat("yyyyƒÍMM‘¬dd»’ HH:mm:ss",Locale.getDefault());
 
 	private static File  localFile = Environment.getExternalStorageDirectory();
 	
 	private static File recordFile = new File(localFile, "weiyu/records.xml");
 	
+	public static File getRecordDir()
+	{
+		return new File(localFile,"weiyu");
+	}
+	
 	public static String getTimeString() {
 		return localSimpleDateFormat.format(new Date());
+	}
+	
+	public static String millis2CalendarString(long time)
+	{
+		return localSimpleDateFormat.format(new Date(time));
+	}
+	
+	public static void deleteFile(File file)
+	{
+		file.delete();
 	}
 	
 	
@@ -143,7 +158,7 @@ public class HKCommonUtils {
 		if (localFile.canWrite())
 		{
 			return localFile.getAbsolutePath() + File.separator+ "weiyu"+ File.separator
-					+ HKCommonUtils.getTimeString() + ".pcm";
+					+ Utils.getTimeString() + ".pcm";
 		}
 			return null;
 		
@@ -164,5 +179,40 @@ public class HKCommonUtils {
 		}
 		return sb.deleteCharAt(sb.length()-1).toString();
 	}
+	
+	public  static Float[] stringToFloatArray(String str)
+	{
+		
+		if(str == null)
+		{
+			return null;
+		}
+		String [] bufs = str.split(",");
+		Float[] arr = new Float[bufs.length];
+		for(int i = 0;i< bufs.length ; i++)
+		{
+			arr[i] = Float.valueOf(bufs[i]);
+		}
+		
+		return arr;
+	}
+
+	public  static Integer[] stringToIntegerArray(String str)
+	{
+		
+		if(str == null)
+		{
+			return null;
+		}
+		String [] bufs = str.split(",");
+		Integer[] arr = new Integer[bufs.length];
+		for(int i = 0;i< bufs.length ; i++)
+		{
+			arr[i] = Integer.valueOf(bufs[i]);
+		}
+		
+		return arr;
+	}
+
 
 }

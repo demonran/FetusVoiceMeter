@@ -1,6 +1,22 @@
 package com.example.fetusvoicemeter.entity;
 
 public class RecorderEntity {
+	
+	
+
+	public RecorderEntity() {
+		super();
+	}
+
+	public RecorderEntity(String name, Integer[] beatValues, Float[] beatTimes,
+			long durationTime, long startTime) {
+		super();
+		this.name = name;
+		this.beatValues = beatValues;
+		this.beatTimes = beatTimes;
+		this.durationTime = durationTime;
+		this.startTime = startTime;
+	}
 
 	private String name;
 	

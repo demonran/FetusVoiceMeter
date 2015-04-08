@@ -1,11 +1,9 @@
 package com.example.fetusvoicemeter;
 
+import java.io.File;
+import java.io.FilenameFilter;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -26,16 +24,21 @@ import android.view.View.OnClickListener;
 import android.view.WindowManager;
 import android.view.animation.Animation;
 import android.view.animation.TranslateAnimation;
+import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemClickListener;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
-import android.widget.SimpleAdapter;
 import android.widget.TextView;
 
+import com.example.fetusvoicemeter.db.RecorderDAO;
+import com.example.fetusvoicemeter.entity.RecorderEntity;
 import com.example.fetusvoicemeter.recorder.RecordingProcess;
+import com.example.fetusvoicemeter.utils.Utils;
 import com.example.fetusvoicemeter.view.HKRecordWaveView;
+import com.example.fetusvoicemeter.view.RecordAdapter;
 import com.fetus.FetusCore;
 
 @SuppressLint("NewApi")
@@ -54,10 +57,12 @@ public class MainActivity extends Activity {
 	private LinearLayout rec_ll;
 	private LinearLayout stop_ll;
 	private LinearLayout save_ll;
+	private LinearLayout playRec_ll;
+	
 	private TextView rec_fq_num;
 
 	private TextView rec_audio_time;
-	
+
 	private EditText et_SaveName;
 
 	private HKRecordWaveView recordWaveView;
@@ -66,16 +71,20 @@ public class MainActivity extends Activity {
 
 	private ListView listview;
 	private TextView emptyView;
+
+	private RecordAdapter recordAdapter;
+	
+	private Status status = Status.STOP;
 	/**
 	 * 在画布上正在显示的数据集合
 	 */
 	private ArrayList<Integer> showedList = new ArrayList<Integer>();
 
-	private List<Map<String, Object>> data = new ArrayList<Map<String, Object>>();
-
 	Timer timer;
 
 	private long writeFileStartTime;
+	
+	private RecorderDAO recorderDao;
 
 	private Handler handler = new Handler() {
 
@@ -117,6 +126,7 @@ public class MainActivity extends Activity {
 		getWindow().setSoftInputMode(
 				WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
 		instance = this;
+		recorderDao = RecorderDAO.createChatMsgDAO(this);
 		initUI();
 
 		// setAudioNormal();
@@ -155,36 +165,52 @@ public class MainActivity extends Activity {
 		stop_ll = (LinearLayout) view1.findViewById(R.id.stop_ll);
 		save_ll = (LinearLayout) view1.findViewById(R.id.save_ll);
 		rec_ll = (LinearLayout) view1.findViewById(R.id.rec_ll);
+		playRec_ll = (LinearLayout) view1.findViewById(R.id.playRec_ll);
 		rec_fq_num = (TextView) view1.findViewById(R.id.rec_fq_num);
-		
-		view1.findViewById(R.id.Bt_save).setOnClickListener(new OnClickListener() {
-			
-			@Override
-			public void onClick(View v) {
-				updateRecUI();
-				mTabPager.setCurrentItem(1);
-				
-			}
-		});
-		
-		view1.findViewById(R.id.Bt_quit).setOnClickListener(new OnClickListener() {
-			
-			@Override
-			public void onClick(View v) {
-				updateRecUI();
-				
-			}
-		});
 
-		et_SaveName = (EditText)view1.findViewById(R.id.ET_SaveName);
+		view1.findViewById(R.id.Bt_save).setOnClickListener(
+				new OnClickListener() {
+
+					@Override
+					public void onClick(View v) {
+						status = Status.STOP;
+						mTabPager.setCurrentItem(1);
+
+					}
+				});
+
+		view1.findViewById(R.id.Bt_quit).setOnClickListener(
+				new OnClickListener() {
+
+					@Override
+					public void onClick(View v) {
+						status = Status.STOP;
+						updateRecordUI();
+
+					}
+				});
+
+		et_SaveName = (EditText) view1.findViewById(R.id.ET_SaveName);
 		View view2 = mLi.inflate(R.layout.main_tab_address, null);
-		emptyView = (TextView)view2.findViewById(R.id.empty);
+		emptyView = (TextView) view2.findViewById(R.id.empty);
 		listview = (ListView) view2.findViewById(R.id.listview);
-		
-		
-		listview.setAdapter(new SimpleAdapter(this, data, R.layout.list_item,
-				new String[] { "fileName", "createTime", "btn_detele" },
-				new int[] { R.id.fileName, R.id.createtime, R.id.Bt_delete }));
+
+		recordAdapter = new RecordAdapter(this);
+		listview.setAdapter(recordAdapter);
+		listview.setOnItemClickListener(new OnItemClickListener() {
+
+			@Override
+			public void onItemClick(AdapterView<?> parent, View view,
+					int position, long id) {
+				File file = recordAdapter.getItem(position);
+				String name = file.getName();
+				RecorderEntity recorderEntity = recorderDao.getData(name);
+				status = Status.PLAY;
+				mTabPager.setCurrentItem(0);
+				
+			}
+			
+		});
 
 		View view3 = mLi.inflate(R.layout.main_tab_friends, null);
 		View view4 = mLi.inflate(R.layout.main_tab_settings, null);
@@ -230,30 +256,15 @@ public class MainActivity extends Activity {
 				if (mRecProcess != null && mRecProcess.isStarted()) {
 					Log.i("TAG", "stop_ll ON cliclk" + mRecProcess.isStarted());
 					mRecProcess.stopAudioRecord();
-					et_SaveName.setText(mRecProcess.getRecorderEntity().getName());
-					stop_ll.setVisibility(View.GONE);
-					save_ll.setVisibility(View.VISIBLE);
+					et_SaveName.setText(mRecProcess.getRecorderEntity()
+							.getName());
+					status = Status.SAVE;
+					updateRecordUI();
 				}
 
 			}
 		});
 
-	}
-
-	private void updateRecUI() {
-		Log.i("TAG",mRecProcess+"");
-		stop_ll.setVisibility(View.VISIBLE);
-		save_ll.setVisibility(View.GONE);
-		if(mRecProcess != null && mRecProcess.isStarted())
-		{
-			play_lr.setVisibility(View.GONE);
-			rec_ll.setVisibility(View.VISIBLE);
-		}else
-		{
-			play_lr.setVisibility(View.VISIBLE);
-			rec_ll.setVisibility(View.GONE);
-		}
-		
 	}
 
 	/**
@@ -268,13 +279,11 @@ public class MainActivity extends Activity {
 
 		@Override
 		public void onClick(View v) {
-			mTabPager.setCurrentItem(index);
+			mTabPager.setCurrentItem(currIndex);
 		}
 	};
 
-	/*
-	 * 页卡切换监听(原作者:D.Winter)
-	 */
+	
 	public class MyOnPageChangeListener implements OnPageChangeListener {
 		@Override
 		public void onPageSelected(int arg0) {
@@ -298,8 +307,6 @@ public class MainActivity extends Activity {
 				}
 				break;
 			case 1:
-				Log.i("TAG","case 1");
-				updateRecordUI();
 				mTab2.setImageDrawable(getResources().getDrawable(
 						R.drawable.tab_recored_pressed));
 				if (currIndex == 0) {
@@ -354,6 +361,7 @@ public class MainActivity extends Activity {
 			currIndex = arg0;
 			animation.setFillAfter(true);// True:图片停在动画结束位置
 			animation.setDuration(150);
+			updateRecordUI();
 		}
 
 		@Override
@@ -364,30 +372,66 @@ public class MainActivity extends Activity {
 		public void onPageScrollStateChanged(int arg0) {
 		}
 	}
-	
-	
-	private void updateRecordUI()
-	{
-		refleshData();
-		if(data.size()==0)
+
+	private void updateRecordUI() {
+		
+		if(currIndex == 0)
 		{
-			listview.setVisibility(View.GONE);
-			emptyView.setVisibility(View.VISIBLE);
-		}else
-		{
-			listview.setVisibility(View.VISIBLE);
-			emptyView.setVisibility(View.GONE);
+			if(status == Status.RECORD)
+			{
+				stop_ll.setVisibility(View.VISIBLE);
+				save_ll.setVisibility(View.GONE);
+				play_lr.setVisibility(View.GONE);
+				rec_ll.setVisibility(View.VISIBLE);
+				playRec_ll.setVisibility(View.GONE);
+			}else if(status == Status.PLAY)
+			{
+				stop_ll.setVisibility(View.VISIBLE);
+				save_ll.setVisibility(View.GONE);
+				play_lr.setVisibility(View.GONE);
+				rec_ll.setVisibility(View.GONE);
+				playRec_ll.setVisibility(View.VISIBLE);
+				
+			}else if(status == Status.STOP)
+			{
+				stop_ll.setVisibility(View.VISIBLE);
+				save_ll.setVisibility(View.GONE);
+				play_lr.setVisibility(View.VISIBLE);
+				rec_ll.setVisibility(View.GONE);
+				playRec_ll.setVisibility(View.GONE);
+			}else if(status == Status.SAVE)
+			{
+				stop_ll.setVisibility(View.GONE);
+				save_ll.setVisibility(View.VISIBLE);
+			}
 		}
+		else if(currIndex == 1)
+		{
+			refleshData();
+			if (recordAdapter.size() == 0) {
+				listview.setVisibility(View.GONE);
+				emptyView.setVisibility(View.VISIBLE);
+			} else {
+				listview.setVisibility(View.VISIBLE);
+				emptyView.setVisibility(View.GONE);
+			}
+		}
+			
+		
+		
 	}
-	
-	private void refleshData()
-	{
-		Map<String,Object> map = new HashMap<String,Object>();
-//		"fileName", "createTime", "btn_detele"
-		map.put("fileName", mRecProcess.getRecorderEntity().getName());
-		map.put("createTime", new Date());
-		map.put("btn_detele", null);
-		data.add(map);
+
+	private void refleshData() {
+		File dir = Utils.getRecordDir();
+		File[] files = dir.listFiles(new FilenameFilter() {
+
+			@Override
+			public boolean accept(File dir, String filename) {
+				return filename.startsWith("recaudio_")
+						|| filename.endsWith(".pcm");
+			}
+		});
+		recordAdapter.reflesh(files);
 	}
 
 	@Override
@@ -406,10 +450,11 @@ public class MainActivity extends Activity {
 	}
 
 	public void btnmainright(View view) {
-		
+
 		this.mRecProcess = new RecordingProcess(this);
 		mRecProcess.startAudioRecord(true);
-		updateRecUI();
+		status = Status.RECORD;
+		updateRecordUI();
 		timer.schedule(new RecBpm(), 1000, 1);
 	}
 
@@ -422,6 +467,11 @@ public class MainActivity extends Activity {
 			msg.arg1 = bpm;
 			handler.sendMessage(msg);
 		}
+	}
+	
+	
+	enum Status{
+		STOP,RECORD,PLAY,SAVE
 	}
 
 }
