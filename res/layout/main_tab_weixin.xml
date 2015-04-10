@@ -1,369 +1,230 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="fill_parent"
-    android:layout_height="fill_parent"
-    android:background="#fcfcfc"
-    android:orientation="vertical" >
+	android:layout_width="fill_parent" android:layout_height="fill_parent"
+	android:background="#fcfcfc" android:orientation="vertical">
 
-    <RelativeLayout
-        android:id="@+id/title"
-        android:layout_width="fill_parent"
-        android:layout_height="60dp"
-        android:background="#78ccf6"
-        android:gravity="center_vertical" >
+	<RelativeLayout android:id="@+id/title"
+		android:layout_width="fill_parent" android:layout_height="60dp"
+		android:background="#78ccf6" android:gravity="center_vertical">
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_centerInParent="true"
-            android:text="宝宝录音机"
-            android:textColor="#ffffff"
-            android:textSize="30sp" />
+		<TextView android:layout_width="wrap_content"
+			android:layout_height="wrap_content" android:layout_centerInParent="true"
+			android:text="宝宝录音机" android:textColor="#ffffff" android:textSize="30sp" />
 
-        <ImageView
-            android:id="@+id/right_btn"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentRight="true"
-            android:layout_centerVertical="true"
-            android:layout_marginRight="20dp"
-            android:onClick="btnmainright"
-            android:src="@drawable/title_btn_function" />
-    </RelativeLayout>
+		<ImageView android:id="@+id/right_btn" android:layout_width="wrap_content"
+			android:layout_height="wrap_content" android:layout_alignParentRight="true"
+			android:layout_centerVertical="true" android:layout_marginRight="20dp"
+			android:onClick="btnmainright" android:src="@drawable/title_btn_function" />
+	</RelativeLayout>
 
-    <LinearLayout
-        android:id="@+id/stop_ll"
-        android:layout_width="fill_parent"
-        android:layout_height="fill_parent"
-        android:orientation="vertical"
-        android:padding="5.0dip" >
+	<LinearLayout android:id="@+id/stop_ll"
+		android:layout_width="fill_parent" android:layout_height="fill_parent"
+		android:orientation="vertical" android:padding="5.0dip">
 
-        <FrameLayout
-            android:layout_width="fill_parent"
-            android:layout_height="250dp"
-            android:orientation="vertical" >
+		<FrameLayout android:layout_width="fill_parent"
+			android:layout_height="250dp" android:orientation="vertical">
 
-            <RelativeLayout
-                android:id="@+id/play_rl"
-                android:layout_width="fill_parent"
-                android:layout_height="fill_parent" >
+			<RelativeLayout android:id="@+id/play_rl"
+				android:layout_width="fill_parent" android:layout_height="fill_parent">
 
-                <ImageView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_centerInParent="true"
-                    android:onClick="btnmainright"
-                    android:src="@drawable/play" />
-            </RelativeLayout>
+				<ImageView android:layout_width="wrap_content"
+					android:layout_height="wrap_content" android:layout_centerInParent="true"
+					android:onClick="btnmainright" android:src="@drawable/play" />
+			</RelativeLayout>
 
-            <LinearLayout
-                android:id="@+id/rec_ll"
-                android:layout_width="fill_parent"
-                android:layout_height="fill_parent"
-                android:orientation="vertical"
-                android:visibility="gone" >
+			<LinearLayout android:id="@+id/rec_ll"
+				android:layout_width="fill_parent" android:layout_height="fill_parent"
+				android:orientation="vertical" android:visibility="gone">
 
-                <FrameLayout
-                    android:layout_width="fill_parent"
-                    android:layout_height="0.0dip"
-                    android:layout_weight="1.0"
-                    android:background="#FB3F36"
-                    android:orientation="vertical"
-                    android:weightSum="2.0" >
+				<FrameLayout android:layout_width="fill_parent"
+					android:layout_height="0.0dip" android:layout_weight="1.0"
+					android:background="#FB3F36" android:orientation="vertical"
+					android:weightSum="2.0">
 
-                    <LinearLayout
-                        android:layout_width="wrap_content"
-                        android:layout_height="fill_parent"
-                        android:layout_gravity="center_vertical"
-                        android:gravity="center_vertical"
-                        android:orientation="vertical" >
+					<LinearLayout android:layout_width="wrap_content"
+						android:layout_height="fill_parent" android:layout_gravity="center_vertical"
+						android:gravity="center_vertical" android:orientation="vertical">
 
-                        <ImageView
-                            android:id="@+id/rec_find_iv"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:src="@drawable/rec_find" />
-                    </LinearLayout>
+						<ImageView android:id="@+id/rec_find_iv"
+							android:layout_width="wrap_content" android:layout_height="wrap_content"
+							android:src="@drawable/rec_find" />
+					</LinearLayout>
 
-                    <LinearLayout
-                        android:id="@+id/rec_topLL"
-                        android:layout_width="fill_parent"
-                        android:layout_height="fill_parent"
-                        android:gravity="center_vertical"
-                        android:orientation="vertical" >
+					<LinearLayout android:id="@+id/rec_topLL"
+						android:layout_width="fill_parent" android:layout_height="fill_parent"
+						android:gravity="center_vertical" android:orientation="vertical">
 
-                        <RelativeLayout
-                            android:layout_width="fill_parent"
-                            android:layout_height="wrap_content"
-                            android:paddingLeft="10.0dip"
-                            android:paddingRight="10.0dip" >
+						<RelativeLayout android:layout_width="fill_parent"
+							android:layout_height="wrap_content" android:paddingLeft="10.0dip"
+							android:paddingRight="10.0dip">
 
-                            <ImageView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_alignParentLeft="true"
-                                android:layout_centerVertical="true"
-                                android:layout_marginLeft="20.0dip"
-                                android:contentDescription=""
-                                android:src="@drawable/heart" />
+							<ImageView android:layout_width="wrap_content"
+								android:layout_height="wrap_content"
+								android:layout_alignParentLeft="true"
+								android:layout_centerVertical="true" android:layout_marginLeft="20.0dip"
+								android:contentDescription="" android:src="@drawable/heart" />
 
-                            <TextView
-                                android:id="@+id/rec_fq_num"
-                                android:layout_width="fill_parent"
-                                android:layout_height="wrap_content"
-                                android:layout_alignParentRight="true"
-                                android:layout_centerVertical="true"
-                                android:gravity="right"
-                                android:text="000"
-                                android:textColor="#ffffffff"
-                                android:textSize="96.0sp" />
-                        </RelativeLayout>
+							<TextView android:id="@+id/rec_fq_num"
+								android:layout_width="fill_parent" android:layout_height="wrap_content"
+								android:layout_alignParentRight="true"
+								android:layout_centerVertical="true" android:gravity="right"
+								android:text="000" android:textColor="#ffffffff"
+								android:textSize="96.0sp" />
+						</RelativeLayout>
 
-                        <RelativeLayout
-                            android:layout_width="fill_parent"
-                            android:layout_height="wrap_content"
-                            android:layout_gravity="bottom"
-                            android:paddingLeft="20.0dip"
-                            android:paddingRight="15.0dip" >
+						<RelativeLayout android:layout_width="fill_parent"
+							android:layout_height="wrap_content" android:layout_gravity="bottom"
+							android:paddingLeft="20.0dip" android:paddingRight="15.0dip">
 
-                            <TextView
-                                android:id="@+id/rec_audio_time"
-                                android:layout_width="60.0dip"
-                                android:layout_height="wrap_content"
-                                android:layout_alignParentRight="true"
-                                android:layout_centerVertical="true"
-                                android:paddingLeft="10.0dip"
-                                android:textColor="#ffffffff"
-                                android:textSize="18.0sp"
-                                android:textStyle="bold" />
+							<TextView android:id="@+id/rec_audio_time"
+								android:layout_width="60.0dip" android:layout_height="wrap_content"
+								android:layout_alignParentRight="true"
+								android:layout_centerVertical="true" android:paddingLeft="10.0dip"
+								android:textColor="#ffffffff" android:textSize="18.0sp"
+								android:textStyle="bold" />
 
-                            <ImageView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_centerVertical="true"
-                                android:layout_toLeftOf="@+id/rec_audio_time"
-                                android:src="@drawable/record_time_icon" />
-                        </RelativeLayout>
-                    </LinearLayout>
-                </FrameLayout>
-            </LinearLayout>
+							<ImageView android:layout_width="wrap_content"
+								android:layout_height="wrap_content"
+								android:layout_centerVertical="true" android:layout_toLeftOf="@+id/rec_audio_time"
+								android:src="@drawable/record_time_icon" />
+						</RelativeLayout>
+					</LinearLayout>
+				</FrameLayout>
+			</LinearLayout>
 
-            <LinearLayout
-                android:id="@+id/playRec_ll"
-                android:layout_width="fill_parent"
-                android:layout_height="wrap_content"
-                android:layout_margin="5.0dip"
-                android:baselineAligned="false"
-                android:orientation="horizontal"
-                android:visibility="gone" >
+			<LinearLayout android:id="@+id/playRec_ll"
+				android:layout_width="fill_parent" android:layout_height="wrap_content"
+				android:layout_margin="5.0dip" android:baselineAligned="false"
+				android:orientation="horizontal" android:visibility="gone">
 
-                <LinearLayout
-                    android:layout_width="0.0dip"
-                    android:layout_height="wrap_content"
-                    android:layout_margin="20.0dip"
-                    android:layout_weight="1.0"
-                    android:orientation="vertical" >
+				<LinearLayout android:layout_width="0.0dip"
+					android:layout_height="wrap_content" android:layout_margin="20.0dip"
+					android:layout_weight="1.0" android:orientation="vertical">
 
-                    <ImageView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="center_horizontal"
-                        android:src="@drawable/head_small" />
+					<ImageView android:layout_width="wrap_content"
+						android:layout_height="wrap_content" android:layout_gravity="center_horizontal"
+						android:src="@drawable/head_small" />
 
-                    <LinearLayout
-                        android:layout_width="fill_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="20.0dip"
-                        android:orientation="horizontal" >
+					<LinearLayout android:layout_width="fill_parent"
+						android:layout_height="wrap_content" android:layout_marginTop="20.0dip"
+						android:orientation="horizontal">
 
-                        <ImageView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:src="@drawable/time_begin" />
+						<ImageView android:layout_width="wrap_content"
+							android:layout_height="wrap_content" android:src="@drawable/time_begin" />
 
-                        <Chronometer
-                            android:id="@+id/chronometer"
-                            android:layout_width="fill_parent"
-                            android:layout_height="wrap_content"
-                            android:layout_marginRight="5.0dip"
-                            android:gravity="right|center"
-                            android:textColor="#ffff6633" />
-                    </LinearLayout>
+						<Chronometer android:id="@+id/chronometer"
+							android:layout_width="fill_parent" android:layout_height="wrap_content"
+							android:layout_marginRight="5.0dip" android:gravity="right|center"
+							android:textColor="#ffff6633" />
+					</LinearLayout>
 
-                    <LinearLayout
-                        android:layout_width="fill_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="15.0dip"
-                        android:orientation="horizontal" >
+					<LinearLayout android:layout_width="fill_parent"
+						android:layout_height="wrap_content" android:layout_marginTop="15.0dip"
+						android:orientation="horizontal">
 
-                        <ImageView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:src="@drawable/time" />
+						<ImageView android:layout_width="wrap_content"
+							android:layout_height="wrap_content" android:src="@drawable/time" />
 
-                        <DigitalClock
-                            android:layout_width="fill_parent"
-                            android:layout_height="wrap_content"
-                            android:layout_marginRight="5.0dip"
-                            android:gravity="right|center"
-                            android:textColor="#ff000000" />
-                    </LinearLayout>
+						<DigitalClock android:layout_width="fill_parent"
+							android:layout_height="wrap_content" android:layout_marginRight="5.0dip"
+							android:gravity="right|center" android:textColor="#ff000000" />
+					</LinearLayout>
 
-                    <LinearLayout
-                        android:layout_width="fill_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="10.0dip"
-                        android:orientation="horizontal" >
+					<LinearLayout android:layout_width="fill_parent"
+						android:layout_height="wrap_content" android:layout_marginTop="10.0dip"
+						android:orientation="horizontal">
 
-                        <ImageView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:src="@drawable/date" />
+						<ImageView android:layout_width="wrap_content"
+							android:layout_height="wrap_content" android:src="@drawable/date" />
 
-                        <TextView
-                            android:id="@+id/TV_date"
-                            android:layout_width="fill_parent"
-                            android:layout_height="wrap_content"
-                            android:layout_marginRight="5.0dip"
-                            android:gravity="right|center"
-                            android:textColor="#ff000000" />
-                    </LinearLayout>
-                </LinearLayout>
+						<TextView android:id="@+id/TV_date" android:layout_width="fill_parent"
+							android:layout_height="wrap_content" android:layout_marginRight="5.0dip"
+							android:gravity="right|center" android:textColor="#ff000000" />
+					</LinearLayout>
+				</LinearLayout>
 
-                <View
-                    android:layout_width="0.0dip"
-                    android:layout_height="fill_parent"
-                    android:layout_weight="0.03"
-                    android:background="#ff68f4ff" />
+				<View android:layout_width="0.0dip" android:layout_height="fill_parent"
+					android:layout_weight="0.03" android:background="#ff68f4ff" />
 
-                <LinearLayout
-                    android:layout_width="0.0dip"
-                    android:layout_height="wrap_content"
-                    android:layout_margin="20.0dip"
-                    android:layout_weight="1.0"
-                    android:orientation="vertical" >
+				<LinearLayout android:layout_width="0.0dip"
+					android:layout_height="wrap_content" android:layout_margin="20.0dip"
+					android:layout_weight="1.0" android:orientation="vertical">
 
-                    <ImageView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="center_horizontal"
-                        android:src="@drawable/heart" />
+					<TextView android:id="@+id/playRec_fq_num"
+						android:layout_width="wrap_content" android:layout_height="wrap_content"
+						android:layout_gravity="center_horizontal" android:text="000"
+						android:textColor="#78ccf6" android:textSize="96.0sp" />
 
-                    <TextView
-                        android:id="@+id/maxBeat"
-                        android:layout_width="fill_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="39.0dip"
-                        android:gravity="right"
-                        android:textColor="#ffff6633" />
+					<TextView android:id="@+id/maxBeat" android:layout_width="fill_parent"
+						android:layout_height="wrap_content" android:layout_marginTop="39.0dip"
+						android:gravity="right" android:textColor="#ffff6633" />
 
-                    <TextView
-                        android:id="@+id/averageBeat"
-                        android:layout_width="fill_parent"
-                        android:layout_height="wrap_content"
-                        android:gravity="center_horizontal"
-                        android:textColor="#ff68f4ff"
-                        android:textSize="35.0dip" />
+					<TextView android:id="@+id/averageBeat"
+						android:layout_width="fill_parent" android:layout_height="wrap_content"
+						android:gravity="center_horizontal" android:textColor="#ff68f4ff"
+						android:textSize="35.0dip" />
 
-                    <TextView
-                         android:id="@+id/minBeat"
-                        android:layout_width="fill_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="10.0dip"
-                        android:gravity="right"
-                        android:textColor="#ffff6633" />
-                </LinearLayout>
-            </LinearLayout>
-        </FrameLayout>
+					<TextView android:id="@+id/minBeat" android:layout_width="fill_parent"
+						android:layout_height="wrap_content" android:layout_marginTop="10.0dip"
+						android:gravity="right" android:textColor="#ffff6633" />
+				</LinearLayout>
+			</LinearLayout>
+		</FrameLayout>
 
-        <View
-            android:layout_width="fill_parent"
-            android:layout_height="3.0dip"
-            android:background="#ff68f4ff" />
+		<View android:layout_width="fill_parent" android:layout_height="3.0dip"
+			android:background="#ff68f4ff" />
 
-        <LinearLayout
-            android:layout_width="fill_parent"
-            android:layout_height="0.0dip"
-            android:layout_weight="1.0"
-            android:background="#fffcf9ee"
-            android:orientation="vertical"
-            android:paddingBottom="5.0dip"
-            android:paddingTop="5.0dip" >
+		<LinearLayout android:layout_width="fill_parent"
+			android:layout_height="0.0dip" android:layout_weight="1.0"
+			android:background="#fffcf9ee" android:orientation="vertical"
+			android:paddingBottom="5.0dip" android:paddingTop="5.0dip">
 
-            <FrameLayout
-                android:layout_width="fill_parent"
-                android:layout_height="0.0dip"
-                android:layout_weight="1.0"
-                android:background="#fffcf9ee" >
+			<FrameLayout android:layout_width="fill_parent"
+				android:layout_height="0.0dip" android:layout_weight="1.0"
+				android:background="#fffcf9ee">
 
-                <com.example.fetusvoicemeter.view.HKRecordBgView
-                    android:layout_width="fill_parent"
-                    android:layout_height="fill_parent"
-                    android:layout_gravity="center_vertical" />
+				<com.example.fetusvoicemeter.view.HKRecordBgView
+					android:layout_width="fill_parent" android:layout_height="fill_parent"
+					android:layout_gravity="center_vertical" />
 
-                <com.example.fetusvoicemeter.view.HKRecordWaveView
-                    android:id="@+id/rec_wave"
-                    android:layout_width="fill_parent"
-                    android:layout_height="fill_parent"
-                    android:layout_gravity="center_vertical" />
-            </FrameLayout>
-        </LinearLayout>
-    </LinearLayout>
+				<com.example.fetusvoicemeter.view.HKRecordWaveView
+					android:id="@+id/rec_wave" android:layout_width="fill_parent"
+					android:layout_height="fill_parent" android:layout_gravity="center_vertical" />
+			</FrameLayout>
+		</LinearLayout>
+	</LinearLayout>
 
-    <LinearLayout
-        android:id="@+id/save_ll"
-        android:layout_width="fill_parent"
-        android:layout_height="fill_parent"
-        android:orientation="vertical"
-        android:padding="5.0dip"
-        android:visibility="gone" >
+	<LinearLayout android:id="@+id/save_ll"
+		android:layout_width="fill_parent" android:layout_height="fill_parent"
+		android:orientation="vertical" android:padding="5.0dip"
+		android:visibility="gone">
 
-        <ImageView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_horizontal"
-            android:layout_margin="20.0dip"
-            android:contentDescription=""
-            android:src="@drawable/head_big" />
+		<ImageView android:layout_width="wrap_content"
+			android:layout_height="wrap_content" android:layout_gravity="center_horizontal"
+			android:layout_margin="20.0dip" android:contentDescription=""
+			android:src="@drawable/head_big" />
 
-        <View
-            android:layout_width="fill_parent"
-            android:layout_height="3.0dip"
-            android:layout_marginBottom="50.0dip"
-            android:background="#ff68f4ff" />
+		<View android:layout_width="fill_parent" android:layout_height="3.0dip"
+			android:layout_marginBottom="50.0dip" android:background="#ff68f4ff" />
 
-        <EditText
-            android:id="@+id/ET_SaveName"
-            android:layout_width="fill_parent"
-            android:layout_height="44.0dip"
-            android:layout_margin="10.0dip"
-            android:background="#ffe6e6e6"
-            android:focusable="false"
-            android:gravity="center"
-            android:inputType="number"
-            android:textColor="#ffff6633"
-            android:textSize="18.0dip" />
+		<EditText android:id="@+id/ET_SaveName" android:layout_width="fill_parent"
+			android:layout_height="44.0dip" android:layout_margin="10.0dip"
+			android:background="#ffe6e6e6" android:focusable="false"
+			android:gravity="center" android:inputType="number"
+			android:textColor="#ffff6633" android:textSize="18.0dip" />
 
-        <LinearLayout
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:padding="5.0dip" >
+		<LinearLayout android:layout_width="fill_parent"
+			android:layout_height="wrap_content" android:orientation="horizontal"
+			android:padding="5.0dip">
 
-            <Button
-                android:id="@+id/Bt_save"
-                android:layout_width="0.0dip"
-                android:layout_height="wrap_content"
-                android:layout_weight="1.0"
-                android:text="保存" />
+			<Button android:id="@+id/Bt_save" android:layout_width="0.0dip"
+				android:layout_height="wrap_content" android:layout_weight="1.0"
+				android:text="保存" />
 
-            <Button
-                android:id="@+id/Bt_quit"
-                android:layout_width="0.0dip"
-                android:layout_height="wrap_content"
-                android:layout_weight="1.0"
-                android:text="取消" />
-        </LinearLayout>
-    </LinearLayout>
+			<Button android:id="@+id/Bt_quit" android:layout_width="0.0dip"
+				android:layout_height="wrap_content" android:layout_weight="1.0"
+				android:text="取消" />
+		</LinearLayout>
+	</LinearLayout>
 
 </LinearLayout>

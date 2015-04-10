@@ -55,16 +55,16 @@ public class HKRecordBgView extends HKBaseView
 //        if (k % 3 == 0);
     for (int k = 0;k <= this.gridXnum/2 ; k++)
     {
-      canvas.drawLine(this.mBaseX + mUnitWidth *20 * k, this.mPaddingTop, this.mBaseX + mUnitWidth *20 * k, View.MeasureSpec.getSize(getHeight()) - this.mPaddingBottom, localPaint2);
-      canvas.drawLine(this.mBaseX - mUnitWidth *20 * k, this.mPaddingTop, this.mBaseX - mUnitWidth *20 * k, View.MeasureSpec.getSize(getHeight()) - this.mPaddingBottom, localPaint2);
+      canvas.drawLine(this.mBaseX + mUnitWidth *80 * k, this.mPaddingTop, this.mBaseX + mUnitWidth *80 * k, View.MeasureSpec.getSize(getHeight()) - this.mPaddingBottom, localPaint2);
+      canvas.drawLine(this.mBaseX - mUnitWidth *80 * k, this.mPaddingTop, this.mBaseX - mUnitWidth *80 * k, View.MeasureSpec.getSize(getHeight()) - this.mPaddingBottom, localPaint2);
     }
   }
 
   private void init()
   {
-    this.mWidth = ((WindowManager)this.mContext.getSystemService("window")).getDefaultDisplay().getWidth();
+    this.mWidth = ((WindowManager)this.mContext.getSystemService("window")).getDefaultDisplay().getWidth()-20;
     this.mBaseX = (this.mWidth / 2.0F);
-    this.maxNum = 20 * gridXnum;
+    this.maxNum = 4* 20 * gridXnum;
 	this.mUnitWidth = this.mWidth/(float)maxNum;
 	 
   }

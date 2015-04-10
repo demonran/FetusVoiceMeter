@@ -4,13 +4,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
-import java.io.IOException;
 import java.io.OutputStream;
-
-import com.example.fetusvoicemeter.db.RecorderDAO;
-import com.example.fetusvoicemeter.entity.RecorderEntity;
-import com.example.fetusvoicemeter.utils.Utils;
-import com.fetus.FetusCore;
 
 import android.content.Context;
 import android.media.AudioFormat;
@@ -18,20 +12,26 @@ import android.media.AudioManager;
 import android.media.AudioRecord;
 import android.media.AudioTrack;
 import android.media.MediaRecorder;
-import android.os.Environment;
 import android.util.Log;
+
+import com.example.fetusvoicemeter.entity.RecorderEntity;
+import com.example.fetusvoicemeter.utils.Utils;
+import com.fetus.FetusCore;
 
 public class RecordingProcess {
 
 	Context mContext;
 
 	boolean isRecording = false;// 是否录放的标记
+	boolean isPlaying = false;
 	static final int frequency = 44100;
 	static final int channelConfiguration = AudioFormat.CHANNEL_CONFIGURATION_MONO;
 	static final int audioEncoding = AudioFormat.ENCODING_PCM_16BIT;
 	int recBufSize, playBufSize;
 	AudioRecord audioRecord;
 	AudioTrack audioTrack;
+	
+	private OnRecordingProcessListener listener;
 	
 	private OutputStream mOutputStream;
 	private File mWriteFile;
@@ -50,6 +50,12 @@ public class RecordingProcess {
 		mContext = context;
 		initRecord();
 	}
+	
+	
+
+	public void setListener(OnRecordingProcessListener listener) {
+		this.listener = listener;
+	}
 
 	private void initRecord() {
 		recBufSize = AudioRecord.getMinBufferSize(frequency,
@@ -66,6 +72,8 @@ public class RecordingProcess {
 		audioTrack = new AudioTrack(AudioManager.STREAM_VOICE_CALL, frequency,
 				channelConfiguration, audioEncoding, playBufSize,
 				AudioTrack.MODE_STREAM);
+		
+//		setAudioOnSpeaker();
 	}
 
 	public void startAudioRecord(boolean paramBoolean) {
@@ -84,7 +92,7 @@ public class RecordingProcess {
 	class RecordPlayThread extends Thread {
 		public void run() {
 			try {
-				byte[] buffer = new byte[recBufSize];
+				short[] buffer = new short[recBufSize];
 				audioRecord.startRecording();// 开始录制
 				audioTrack.play();// 开始播放
 				 startWriteFile();
@@ -94,14 +102,22 @@ public class RecordingProcess {
 					int bufferReadResult = audioRecord.read(buffer, 0,
 							recBufSize);
 
-					byte[] tmpBuf = new byte[bufferReadResult];
+					short[] tmpBuf = new short[bufferReadResult];
 					System.arraycopy(buffer, 0, tmpBuf, 0, bufferReadResult);
 					// 写入数据即播放
 					// Log.i("TAG","tmpBuf.length="+tmpBuf.length+"---");
 					// audioTrack.write(buffer, 0, bufferReadResult);
 					audioTrack.write(tmpBuf, 0, tmpBuf.length);
-					 FetusCore.put(tmpBuf, tmpBuf.length);
-					 mOutputStream.write(tmpBuf);
+					byte[] bytes = new byte[2*tmpBuf.length];
+					for(int i=0;i<tmpBuf.length;i++)
+					{
+						bytes[i]=(byte)(tmpBuf[i]>>8 & 0xff);
+						bytes[i+1]=(byte)(tmpBuf[i] & 0xff);
+					}
+					
+					 FetusCore.put(bytes, bytes.length);
+					 mOutputStream.write(bytes);
+//					 mOutputStream.write(tmpBuf);
 
 				}
 				audioTrack.stop();
@@ -117,10 +133,18 @@ public class RecordingProcess {
 		if (this.audioTrack != null){
 			audioTrack.play();// 开始播放
 			try {
-				this.isRecording = true;
+				this.isPlaying = true;
 				new PlayThread(pcmFile).start();// 开一条线程边录边放
 			} catch (Exception e) {
 			}
+		}
+			
+	}
+	
+	public void stopAudioPlay() {
+		if (this.audioTrack != null){
+			audioTrack.stop();// 停止播放
+			isPlaying = false;
 		}
 			
 	}
@@ -140,7 +164,7 @@ public class RecordingProcess {
 				audioTrack.play();// 开始播放
 				FileInputStream fis = new FileInputStream(pcmFile);
 				int len = -1;
-				while ((len= fis.read(buffer))!= -1) {
+				while (isPlaying && (len= fis.read(buffer))!= -1) {
 					byte[] tmpBuf = new byte[len];
 					System.arraycopy(buffer, 0, tmpBuf, 0, len);
 					// 写入数据即播放
@@ -149,6 +173,7 @@ public class RecordingProcess {
 				}
 				fis.close();
 				audioTrack.stop();
+				listener.onPlayStop();
 			} catch (Throwable t) {
 				t.printStackTrace();
 			}
@@ -232,4 +257,15 @@ public class RecordingProcess {
 		mWriteFile.delete();
 		
 	}
+	
+	  public  interface OnRecordingProcessListener
+	  {
+	    public  void onPlayStop();
+
+//	    public  void onRevBpmEvent(boolean paramBoolean, int paramInt);
+//
+//	    public  void onRevWaveFormDataEvent(float[] paramArrayOfFloat, boolean[] paramArrayOfBoolean);
+//
+//	    public  void onSDCardFullEvent();
+	  }
 }
