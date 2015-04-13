@@ -35,7 +35,12 @@ public class RecordAdapter extends BaseAdapter {
 
 	public void reflesh(File[] files) {
 		data.clear();
-		data.addAll(Arrays.asList(files));
+		data.add(new File("Ê¾Àý"));
+		if(files != null)
+		{
+			data.addAll(Arrays.asList(files));
+		}
+		
 
 	}
 
@@ -63,7 +68,12 @@ public class RecordAdapter extends BaseAdapter {
 		TextView localTextView2 = (TextView) localView
 				.findViewById(R.id.createtime);
 		final File localFile = getItem(position);
+		
 		localTextView1.setText(localFile.getName());
+		if("Ê¾Àý".equals(localFile.getName()))
+		{
+			return localView;
+		}
 //		localTextView2.setText(Utils.millis2CalendarString(localFile
 //				.lastModified()));
 		localTextView2.setText(localFile.length()+"");

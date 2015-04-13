@@ -164,7 +164,12 @@ public class Utils {
 		
 		if (localFile.canWrite())
 		{
-			return localFile.getAbsolutePath() + File.separator+ "weiyu"+ File.separator
+			File weiyuFile = new File(localFile,"weiyu");
+			if(!weiyuFile.exists())
+			{
+				weiyuFile.mkdir();
+			}
+			return weiyuFile.getAbsolutePath() + File.separator
 					+ Utils.getTimeString() + ".pcm";
 		}
 			return null;

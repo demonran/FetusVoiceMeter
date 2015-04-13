@@ -9,7 +9,7 @@ import android.view.WindowManager;
 
 public class HKRecordBgView extends HKBaseView
 {
-  protected int gridYnum = 15;
+  protected int gridYnum = 18;
   protected int gridXnum = 8;
   private float mBaseX = 0.0F;
   private Context mContext;

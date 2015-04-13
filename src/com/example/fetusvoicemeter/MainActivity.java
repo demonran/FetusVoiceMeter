@@ -427,6 +427,7 @@ public class MainActivity extends Activity {
 
 	private void refleshData() {
 		File dir = Utils.getRecordDir();
+		Log.i("TAG",dir.toString());
 		File[] files = dir.listFiles(new FilenameFilter() {
 
 			@Override

@@ -1,10 +1,12 @@
 package com.example.fetusvoicemeter.recorder;
 
+import java.io.DataOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
-import java.io.OutputStream;
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
 
 import android.content.Context;
 import android.media.AudioFormat;
@@ -33,7 +35,7 @@ public class RecordingProcess {
 	
 	private OnRecordingProcessListener listener;
 	
-	private OutputStream mOutputStream;
+	private DataOutputStream mOutputStream;
 	private File mWriteFile;
 	
 	private RecorderEntity recorderEntity;
@@ -73,13 +75,13 @@ public class RecordingProcess {
 				channelConfiguration, audioEncoding, playBufSize,
 				AudioTrack.MODE_STREAM);
 		
-//		setAudioOnSpeaker();
 	}
 
 	public void startAudioRecord(boolean paramBoolean) {
 		if (this.audioRecord != null)
 			try {
 				startDealThread();
+				setAudioOnSpeaker();
 				this.audioRecord.startRecording();
 				this.isRecording = true;
 				if (paramBoolean) {
@@ -109,11 +111,12 @@ public class RecordingProcess {
 					// audioTrack.write(buffer, 0, bufferReadResult);
 					audioTrack.write(tmpBuf, 0, tmpBuf.length);
 					byte[] bytes = new byte[2*tmpBuf.length];
-					for(int i=0;i<tmpBuf.length;i++)
-					{
-						bytes[i]=(byte)(tmpBuf[i]>>8 & 0xff);
-						bytes[i+1]=(byte)(tmpBuf[i] & 0xff);
-					}
+					ByteBuffer.wrap(bytes).order(ByteOrder.LITTLE_ENDIAN).asShortBuffer().put(tmpBuf);
+//					for(int i=0;i<tmpBuf.length;i++)
+//					{
+//						bytes[i]=(byte)(tmpBuf[i]>>8 & 0xff);
+//						bytes[i+1]=(byte)(tmpBuf[i] & 0xff);
+//					}
 					
 					 FetusCore.put(bytes, bytes.length);
 					 mOutputStream.write(bytes);
@@ -165,10 +168,13 @@ public class RecordingProcess {
 				FileInputStream fis = new FileInputStream(pcmFile);
 				int len = -1;
 				while (isPlaying && (len= fis.read(buffer))!= -1) {
-					byte[] tmpBuf = new byte[len];
-					System.arraycopy(buffer, 0, tmpBuf, 0, len);
+					short[] audioData = new short[len/2];
+					// to turn bytes to shorts as either big endian or little endian. 
+					ByteBuffer.wrap(buffer).order(ByteOrder.LITTLE_ENDIAN).asShortBuffer().get(audioData);
+//					byte[] tmpBuf = new byte[len];
+//					System.arraycopy(buffer, 0, tmpBuf, 0, len);
 					// 写入数据即播放
-					audioTrack.write(tmpBuf, 0, tmpBuf.length);
+					audioTrack.write(audioData, 0, audioData.length);
 
 				}
 				fis.close();
@@ -185,7 +191,7 @@ public class RecordingProcess {
 		if (createWriteFile())
 		{
 			try {
-				this.mOutputStream = new FileOutputStream(this.mWriteFile);
+				this.mOutputStream = new DataOutputStream(new FileOutputStream(this.mWriteFile));
 				recorderEntity.setStartTime(System.currentTimeMillis());
 				bool = true;
 			} catch (FileNotFoundException e) {
@@ -217,7 +223,7 @@ public class RecordingProcess {
 		AudioManager localAudioManager = (AudioManager) mContext
 				.getSystemService(Context.AUDIO_SERVICE);
 		Log.i("TAG", localAudioManager.isSpeakerphoneOn() + "**");
-		localAudioManager.setMode(AudioManager.MODE_NORMAL);
+//		localAudioManager.setMode(AudioManager.MODE_NORMAL);
 		if (localAudioManager.isWiredHeadsetOn())
 			localAudioManager.setSpeakerphoneOn(false);
 
@@ -227,11 +233,12 @@ public class RecordingProcess {
 	private void setAudioOnSpeaker() {
 		AudioManager audioManager = (AudioManager) mContext
 				.getSystemService(Context.AUDIO_SERVICE);
-		// audioManager.setMode(AudioManager.MODE_IN_CALL);
-		audioManager.setSpeakerphoneOn(true);// 使用扬声器外放，即使已经插入耳机
+//		 audioManager.setMode(AudioManager.MODE_IN_CALL);
+		  audioManager.setMicrophoneMute(false);
+		audioManager.setSpeakerphoneOn(false);// 使用扬声器外放，即使已经插入耳机
 		audioManager
 				.setStreamVolume(AudioManager.STREAM_VOICE_CALL, audioManager
-						.getStreamMaxVolume(AudioManager.STREAM_VOICE_CALL),
+						.getStreamVolume(AudioManager.STREAM_VOICE_CALL),
 						AudioManager.STREAM_VOICE_CALL);
 	}
 
@@ -244,6 +251,7 @@ public class RecordingProcess {
 	public void stopAudioRecord()
 	{
 		stopWriteFile();
+		setAudioNormal();
 		this.isRecording = false;
 	    this.audioRecord.stop();
 	}

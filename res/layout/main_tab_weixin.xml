@@ -22,7 +22,7 @@
 		android:orientation="vertical" android:padding="5.0dip">
 
 		<FrameLayout android:layout_width="fill_parent"
-			android:layout_height="250dp" android:orientation="vertical">
+			android:layout_height="220dp" android:orientation="vertical">
 
 			<RelativeLayout android:id="@+id/play_rl"
 				android:layout_width="fill_parent" android:layout_height="fill_parent">
