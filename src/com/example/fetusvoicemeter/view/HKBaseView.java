@@ -97,7 +97,7 @@ public class HKBaseView extends View
   {
     this.mTextPaint = new Paint();
     this.mTextPaint.setColor(Color.RED);
-    this.mTextPaint.setTextSize(getResources().getDimension(R.dimen.app_icon_size));
+    this.mTextPaint.setTextSize(20);
     this.mTextPaint.setAntiAlias(true);
   }
 }

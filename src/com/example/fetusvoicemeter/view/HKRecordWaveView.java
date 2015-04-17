@@ -102,7 +102,3 @@ public class HKRecordWaveView extends HKRecordBgView {
 	}
 }
 
-/*
- * Location: C:\Users\Administrator\Desktop\classes_dex2jar.jar Qualified Name:
- * com.icarenewlife.view.HKRecordWaveView JD-Core Version: 0.6.2
- */

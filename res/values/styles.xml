@@ -16,7 +16,45 @@
     <style name="AppTheme" parent="AppBaseTheme">
         <!-- All customizations that are NOT specific to a particular API-level can go here. -->
     </style>
-
+    
+        <style name="Label">
+        <item name="android:gravity">center</item>
+    </style>
+    
+    <style name="Label.Hint" parent="@style/Label">
+        <item name="android:textSize">@dimen/text_size_large</item>
+        <item name="android:textColor">#ff333333</item>
+    </style>
+    
+        <style name="Button">
+        <item name="android:textSize">@dimen/text_size_medium</item>
+        <item name="android:textColor">#ffffffff</item>
+        <item name="android:gravity">center</item>
+        <item name="android:background">@drawable/btn_common</item>
+        <item name="android:minHeight">43.0dip</item>
+        <item name="android:singleLine">true</item>
+        <item name="android:shadowColor">#ff820200</item>
+        <item name="android:shadowDx">0.0</item>
+        <item name="android:shadowDy">1.0</item>
+        <item name="android:shadowRadius">1.0</item>
+    </style>
+    <style name="ButtonSecond">
+        <item name="android:textSize">@dimen/text_size_medium</item>
+        <item name="android:textColor">#ff000000</item>
+        <item name="android:gravity">center</item>
+        <item name="android:background">@drawable/btn_second</item>
+        <item name="android:minHeight">43.0dip</item>
+        <item name="android:singleLine">true</item>
+        <item name="android:shadowColor">#ffeeeeee</item>
+        <item name="android:shadowDx">0.0</item>
+        <item name="android:shadowDy">1.0</item>
+        <item name="android:shadowRadius">1.0</item>
+    </style>
+    
+      <style name="ItemSubtitle">
+        <item name="android:textSize">@dimen/text_size_small</item>
+        <item name="android:textColor">#ff848484</item>
+    </style>
     
     <style name="chat_text_date_style">
 	    <item name="android:padding">2dp</item>    

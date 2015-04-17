@@ -33,4 +33,40 @@
     <dimen name="history_item_title_size">16.0sp</dimen>
     <dimen name="history_item_average_size">24.0sp</dimen>
     <dimen name="history_item_summary_size">12.0sp</dimen>
+    
+    
+        <dimen name="indicator_right_padding">10.0dip</dimen>
+    <dimen name="indicator_corner_radius">12.0dip</dimen>
+    <dimen name="indicator_internal_padding">4.0dip</dimen>
+    <dimen name="header_footer_left_right_padding">24.0dip</dimen>
+    <dimen name="header_footer_top_bottom_padding">12.0dip</dimen>
+    <dimen name="text_size_xsmall">12.0sp</dimen>
+    <dimen name="text_size_small">14.0sp</dimen>
+    <dimen name="text_size_medium">16.0sp</dimen>
+    <dimen name="text_size_large">18.0sp</dimen>
+    <dimen name="text_size_xlarge">20.0sp</dimen>
+    <dimen name="padding_xlarge">20.0dip</dimen>
+    <dimen name="padding_large">15.0dip</dimen>
+    <dimen name="padding_medium">10.0dip</dimen>
+    <dimen name="padding_small">5.0dip</dimen>
+    <dimen name="actionbar_height">48.0dip</dimen>
+    <dimen name="actionbar_btn_min_width">52.0dip</dimen>
+    <dimen name="sidebar_width">240.0dip</dimen>
+    <dimen name="dialog_width">290.0dip</dimen>
+    <dimen name="dialog_footer_height">52.0dip</dimen>
+    <dimen name="pager_title_height">48.0dip</dimen>
+    <dimen name="cookbook_item_width">100.0dip</dimen>
+    <dimen name="panel_border_width">1.0dip</dimen>
+    <dimen name="header_padding_left">10.0dip</dimen>
+    <dimen name="home_tabbar_height">45.0dip</dimen>
+    <dimen name="home_tabbar_divider_width">1.0px</dimen>
+    <dimen name="button_large">200.0dip</dimen>
+    <dimen name="list_line_width">1.0px</dimen>
+    <dimen name="edittext_size_medium">100.0dip</dimen>
+    <dimen name="pregnancy_date_cell_height">40.0dip</dimen>
+    <dimen name="setting_padding_left">12.0dip</dimen>
+    <dimen name="setting_text_padding">6.0dip</dimen>
+    <dimen name="setting_line_padding">18.0dip</dimen>
+    <dimen name="necessary_item_padding">10.0dip</dimen>
+    <dimen name="shop_rate_width">18.0dip</dimen>
 </resources>

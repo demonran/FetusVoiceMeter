@@ -3,86 +3,65 @@
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
         android:background="#eee"
-        android:orientation="vertical" >
-        <!-- 
-        <LinearLayout 
-  			android:layout_width="fill_parent"
-  			android:layout_height="45dp"
-  			android:id="@+id/title" 
-  			android:background="@drawable/title_bar"
-  			android:gravity="center_horizontal|center_vertical"  >  
-      		<TextView
-        		android:layout_width="wrap_content" 
-        		android:layout_height="wrap_content" 
-        		android:text="朋友们"
-        		android:textSize="20sp"		
-				android:textColor="#ffffff" />       
-			</LinearLayout>
-		<RelativeLayout      				    
-            android:layout_width="fill_parent"
+         android:orientation="vertical"
+         >
+       <RelativeLayout
+        android:id="@+id/title_bar"
+        android:layout_width="fill_parent"
+        android:layout_height="60dp"
+        android:background="#78ccf6"
+        android:gravity="center_vertical" >
+
+        <TextView
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="14dp"
-            android:gravity="center_vertical"
-            android:clickable="true"
-            android:background="@drawable/preference_single_item" >
-      		<ImageView
-      		    android:id="@+id/add_friend"
-            	android:layout_width="wrap_content"
-        		android:layout_height="wrap_content"        	     	
-        		android:scaleType="matrix"
-        		android:layout_centerVertical="true"
-        		android:layout_alignParentLeft="true"
-        		android:src="@drawable/find_more_friend_addfriend_icon" />    
-            <TextView
-        		android:layout_width="wrap_content" 
-        		android:layout_height="wrap_content"
-        		android:layout_toRightOf="@id/add_friend"
-        		android:layout_centerVertical="true"
-        		android:padding="8dp" 
-        		android:text="添加朋友"
-        		android:textSize="17sp"		
-				android:textColor="#000" /> 
-			<ImageView
-            	android:layout_width="wrap_content"
-        		android:layout_height="wrap_content"        	     	
-        		android:scaleType="matrix"
-        		android:layout_centerVertical="true"
-        		android:layout_alignParentRight="true"
-        		android:src="@drawable/mm_submenu" />      					
-   		</RelativeLayout>
-   		
-		<RelativeLayout      				    
-            android:layout_width="fill_parent"
+            android:layout_centerInParent="true"
+            android:text="胎动计数"
+            android:textColor="#ffffff"
+            android:textSize="30sp" />
+
+        <ImageView
+            android:id="@+id/right_btn"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="14dp"
-            android:gravity="center_vertical"
-            android:clickable="true"
-            android:background="@drawable/preference_single_item"
-            android:onClick="btn_shake" >
-      		<ImageView
-      		    android:id="@+id/add_friend_shake"
-            	android:layout_width="wrap_content"
-        		android:layout_height="wrap_content"        	     	
-        		android:scaleType="matrix"
-        		android:layout_centerVertical="true"
-        		android:layout_alignParentLeft="true"
-        		android:src="@drawable/find_more_friend_shake" />    
-            <TextView
-        		android:layout_width="wrap_content" 
-        		android:layout_height="wrap_content"
-        		android:layout_toRightOf="@id/add_friend_shake"
-        		android:layout_centerVertical="true"
-        		android:padding="8dp" 
-        		android:text="摇一摇"
-        		android:textSize="17sp"		
-				android:textColor="#000" /> 
-			<ImageView
-            	android:layout_width="wrap_content"
-        		android:layout_height="wrap_content"        	     	
-        		android:scaleType="matrix"
-        		android:layout_centerVertical="true"
-        		android:layout_alignParentRight="true"
-        		android:src="@drawable/mm_submenu" />      					
-   		</RelativeLayout>
- -->
+            android:layout_alignParentRight="true"
+            android:layout_centerVertical="true"
+            android:layout_marginRight="20dp"
+            android:onClick="btnmainright"
+            android:src="@drawable/title_btn_function" />
+    </RelativeLayout>
+    
+    <LinearLayout android:gravity="center" android:orientation="vertical" android:id="@+id/start_root" android:paddingBottom="30.0dip" android:layout_width="fill_parent" android:layout_height="fill_parent">
+        <TextView android:gravity="center_horizontal" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="连续的胎动会自动予以排除；\n最小间隔时间外的记为有效胎动" android:lineSpacingExtra="4.0dip" style="@style/ItemSubtitle" />
+        <Button android:id="@+id/start_btn" android:layout_width="@dimen/button_large" android:layout_height="wrap_content" android:layout_marginTop="25.0dip" android:text="开始监测" style="@style/Button" />
+    </LinearLayout>
+    
+       <LinearLayout android:id="@+id/taidong_record_root" android:orientation="vertical" android:paddingTop="@dimen/padding_large" android:paddingBottom="@dimen/padding_large" android:layout_width="fill_parent" android:layout_height="fill_parent" android:visibility="gone">
+            <LinearLayout android:orientation="vertical" android:background="@drawable/feed_item_bg" android:padding="@dimen/padding_large" android:layout_width="fill_parent" android:layout_height="wrap_content">
+                <LinearLayout android:orientation="horizontal" android:layout_width="fill_parent" android:layout_height="wrap_content">
+                    <TextView android:gravity="left" android:paddingRight="10.0dip" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="开始时间：" style="@style/Label.Hint" />
+                    <TextView android:textSize="@dimen/text_size_small" android:gravity="right" android:id="@+id/taidong_begin_time_text" android:background="@drawable/edittext_bg_normal" android:paddingRight="10.0dip" android:layout_width="0.0dip" android:layout_height="wrap_content" android:singleLine="true" android:layout_weight="1.0" style="@style/Label.Hint" />
+                </LinearLayout>
+                <LinearLayout android:orientation="horizontal" android:layout_width="fill_parent" android:layout_height="wrap_content" android:layout_marginTop="4.0dip">
+                    <TextView android:gravity="left" android:paddingRight="10.0dip" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="剩余时间：" style="@style/Label.Hint" />
+                    <TextView android:textSize="@dimen/text_size_small" android:gravity="right" android:id="@+id/taidong_remain_time_text" android:background="@drawable/edittext_bg_normal" android:paddingRight="10.0dip" android:layout_width="0.0dip" android:layout_height="wrap_content" android:singleLine="true" android:layout_weight="1.0" style="@style/Label.Hint" />
+                </LinearLayout>
+                <LinearLayout android:orientation="horizontal" android:layout_width="fill_parent" android:layout_height="wrap_content" android:layout_marginTop="4.0dip">
+                    <TextView android:gravity="left" android:paddingRight="10.0dip" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="最小间隔：" style="@style/Label.Hint" />
+                    <TextView android:textSize="@dimen/text_size_small" android:gravity="right" android:text="1" android:id="@+id/taidong_distance_text" android:background="@drawable/edittext_bg_normal" android:paddingRight="10.0dip" android:layout_width="0.0dip" android:layout_height="wrap_content" android:singleLine="true" android:layout_weight="1.0" style="@style/Label.Hint" />
+                </LinearLayout>
+                <LinearLayout android:orientation="horizontal" android:layout_width="fill_parent" android:layout_height="wrap_content" android:layout_marginTop="4.0dip">
+                    <TextView android:gravity="left" android:paddingRight="10.0dip" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="点击次数：" style="@style/Label.Hint" />
+                    <TextView android:textSize="@dimen/text_size_small" android:gravity="right" android:text="0" android:id="@+id/taidong_num_text" android:background="@drawable/edittext_bg_normal" android:paddingRight="10.0dip" android:layout_width="0.0dip" android:layout_height="wrap_content" android:singleLine="true" android:layout_weight="1.0" style="@style/Label.Hint" />
+                </LinearLayout>
+                <LinearLayout android:orientation="horizontal" android:layout_width="fill_parent" android:layout_height="wrap_content" android:layout_marginTop="4.0dip">
+                    <TextView android:gravity="left" android:paddingRight="10.0dip" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="有效次数：" style="@style/Label.Hint" />
+                    <TextView android:textSize="@dimen/text_size_small" android:gravity="right" android:text="0" android:id="@+id/taidong_valid_num" android:background="@drawable/edittext_bg_normal" android:paddingRight="10.0dip" android:layout_width="0.0dip" android:layout_height="wrap_content" android:singleLine="true" android:layout_weight="1.0" style="@style/Label.Hint" />
+                </LinearLayout>
+            </LinearLayout>
+            <LinearLayout android:gravity="center" android:orientation="horizontal" android:paddingTop="15.0dip" android:layout_width="fill_parent" android:layout_height="wrap_content">
+                <Button android:layout_gravity="center_horizontal" android:id="@+id/action_btn" android:layout_width="140.0dip" android:layout_height="wrap_content" android:layout_marginTop="20.0dip" android:layout_marginRight="5.0dip" android:text="胎 动" style="@style/Button" />
+                <Button android:layout_gravity="center_horizontal" android:id="@+id/stop_btn" android:layout_width="140.0dip" android:layout_height="wrap_content" android:layout_marginLeft="5.0dip" android:layout_marginTop="15.0dip" android:text="停止监测" style="@style/ButtonSecond" />
+            </LinearLayout>
+        </LinearLayout>
     </LinearLayout>

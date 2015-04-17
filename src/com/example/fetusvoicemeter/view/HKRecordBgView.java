@@ -45,11 +45,13 @@ public class HKRecordBgView extends HKBaseView
 		  if (i % 3 == 0)
 		  {
 			  localPaint2 = mGridBondPaint;
+			  canvas.drawText(40+10*(this.gridYnum-i)+"",mWidth-20, this.mPaddingTop + f1 * i, mTextPaint);
 		  }else
 		  {
 			  localPaint2 = mGridPaint;
 		  }
 	    canvas.drawLine(0.0F, this.mPaddingTop + f1 * i, View.MeasureSpec.getSize(getWidth()), this.mPaddingTop + f1 * i, localPaint2);
+//	    canvas.drawText(40+10*i+"",mWidth-40, this.mPaddingTop + f1 * i, mTextPaint);
 	  }
     
 //        if (k % 3 == 0);

@@ -17,6 +17,7 @@ import android.util.Log;
 import android.view.WindowManager;
 import android.widget.Chronometer;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.fetusvoicemeter.db.RecorderDAO;
 import com.example.fetusvoicemeter.entity.RecorderEntity;
@@ -137,7 +138,7 @@ public class PlayRecActivity extends Activity implements OnRecordingProcessListe
 			
 			@Override
 			public void onCompletion(MediaPlayer mp) {
-				stopPlay();
+				onPlayStop();
 				
 			}
 		});
@@ -158,6 +159,11 @@ public class PlayRecActivity extends Activity implements OnRecordingProcessListe
 					msg.arg1 = beatValus[count];
 					handler.sendMessage(msg);
 					count++;
+				}else if(currTime % 250 == 0)
+				{
+					Message msg = new Message();
+					msg.arg1 = beatValus[count];
+					handler.sendMessage(msg);
 				}
 				
 			}
@@ -221,6 +227,7 @@ public class PlayRecActivity extends Activity implements OnRecordingProcessListe
 	@Override
 	public void onPlayStop() {
 		Log.i("TAG","onPlayStop");
+		Toast.makeText(this, "播放完毕！", Toast.LENGTH_LONG).show();
 		stopPlay();
 		
 	}

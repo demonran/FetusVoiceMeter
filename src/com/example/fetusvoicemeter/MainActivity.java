@@ -40,6 +40,7 @@ import com.example.fetusvoicemeter.recorder.RecordingProcess;
 import com.example.fetusvoicemeter.utils.Utils;
 import com.example.fetusvoicemeter.view.HKRecordWaveView;
 import com.example.fetusvoicemeter.view.RecordAdapter;
+import com.example.fetusvoicemeter.view.TaidongView;
 import com.fetus.FetusCore;
 
 @SuppressLint("NewApi")
@@ -215,14 +216,14 @@ public class MainActivity extends Activity {
 			
 		});
 
-		View view3 = mLi.inflate(R.layout.main_tab_friends, null);
+		TaidongView view3 = new TaidongView(this);
 		View view4 = mLi.inflate(R.layout.main_tab_settings, null);
 
 		// 每个页面的view数据
 		final ArrayList<View> views = new ArrayList<View>();
 		views.add(view1);
 		views.add(view2);
-		views.add(view3);
+		views.add(view3.getView());
 		views.add(view4);
 		// 填充ViewPager的数据适配器
 		PagerAdapter mPagerAdapter = new PagerAdapter() {
